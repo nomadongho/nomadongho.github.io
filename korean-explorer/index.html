@@ -5,25 +5,145 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Korean Explorer 🇰🇷</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── SPA Screen routing ── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ── Memory Game specific ── */
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 16px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .mem-card {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: transform 0.3s;
+      transform-style: preserve-3d;
+      position: relative;
+    }
+
+    .mem-card .mem-front,
+    .mem-card .mem-back {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backface-visibility: hidden;
+      font-size: 1.3rem;
+      font-weight: bold;
+    }
+
+    .mem-card .mem-back {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: #fff;
+      font-size: 2rem;
+    }
+
+    .mem-card .mem-front {
+      background: #fff;
+      border: 3px solid var(--secondary);
+      flex-direction: column;
+      gap: 4px;
+      transform: rotateY(180deg);
+      font-size: 1.2rem;
+      padding: 6px;
+      text-align: center;
+    }
+
+    .mem-card.flipped { transform: rotateY(180deg); }
+    .mem-card.matched .mem-front { border-color: var(--green); background: #f0fff4; }
+
+    /* ── Listen & Choose specific ── */
+    .listen-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .listen-option {
+      background: #fff;
+      border: 3px solid #ddd;
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      cursor: pointer;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      font-family: inherit;
+    }
+
+    .listen-option:hover { border-color: var(--secondary); background: #f0fffe; transform: scale(1.03); }
+    .listen-option.correct { border-color: var(--green);  background: #f0fff4; }
+    .listen-option.wrong   { border-color: var(--primary); background: #fff0f0; }
+
+    /* ── Drag & Drop specific ── */
+    .drag-zone {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 16px 0;
+    }
+
+    .drop-slot {
+      background: #f8f9fa;
+      border: 3px dashed #ccc;
+      border-radius: var(--radius-sm);
+      min-width: 130px;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      padding: 10px;
+      text-align: center;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .drop-slot.drag-over  { border-color: var(--purple); background: #f5f0ff; }
+    .drop-slot.correct    { border-color: var(--green);  background: #f0fff4; }
+    .drop-slot.wrong      { border-color: var(--primary); background: #fff0f0; }
+    .drop-slot .slot-label { font-size: 0.85rem; color: #aaa; }
+
+    .drag-items-zone {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
 
 <header>
-  <a class="logo" href="index.html">
+  <a class="logo" href="#" onclick="showScreen('home'); return false;">
     <span class="logo-icon">🇰🇷</span>
     <span class="logo-text">Korean Explorer</span>
   </a>
   <nav>
-    <a href="hangul.html">🔤 Hangul</a>
-    <a href="words.html">🐱 Words</a>
-    <a href="numbers.html">🔢 Numbers</a>
-    <a href="phrases.html">💬 Phrases</a>
-    <a href="games.html">🎮 Games</a>
+    <a href="#" id="nav-hangul"  onclick="showScreen('hangul');  return false;">🔤 Hangul</a>
+    <a href="#" id="nav-words"   onclick="showScreen('words');   return false;">🐱 Words</a>
+    <a href="#" id="nav-numbers" onclick="showScreen('numbers'); return false;">🔢 Numbers</a>
+    <a href="#" id="nav-phrases" onclick="showScreen('phrases'); return false;">💬 Phrases</a>
+    <a href="#" id="nav-games"   onclick="showScreen('games');   return false;">🎮 Games</a>
   </nav>
 </header>
 
-<main>
-  <!-- Progress widget -->
+<!-- Shared progress widget -->
+<div style="max-width:1100px; margin:0 auto; padding:20px 20px 0">
   <div class="progress-widget">
     <div class="level-badge" id="level-display">Level 1</div>
     <div class="progress-bar-wrap">
@@ -32,56 +152,1605 @@
     <div class="points-display" id="points-display">⭐ 0 pts</div>
     <div class="stars-display" id="stars-display"></div>
   </div>
+</div>
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-emoji">🇰🇷</div>
-    <h1>Korean Explorer!</h1>
-    <p>Let's learn Korean together! Choose a lesson below 👇</p>
-    <button class="btn btn-primary btn-lg" onclick="AudioManager.speakEnglish('Welcome to Korean Explorer! Let\\'s learn Korean together!')">
-      🔊 Welcome!
-    </button>
-  </div>
+<!-- ═══════════════════════════════════════════ -->
+<!-- SCREEN: HOME                                -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-home" class="screen active">
+  <main>
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-emoji">🇰🇷</div>
+      <h1>Korean Explorer!</h1>
+      <p>Let's learn Korean together! Choose a lesson below 👇</p>
+      <button class="btn btn-primary btn-lg" onclick="AudioManager.speakEnglish('Welcome to Korean Explorer! Let\'s learn Korean together!')">
+        🔊 Welcome!
+      </button>
+    </div>
 
-  <!-- Module grid -->
-  <div class="module-grid">
-    <a href="hangul.html" class="module-card hangul">
-      <div class="card-emoji">🔤</div>
-      <h2>Hangul Explorer</h2>
-      <p>Learn Korean letters A-B-C!</p>
-    </a>
-    <a href="words.html" class="module-card words">
-      <div class="card-emoji">🐱</div>
-      <h2>Word Explorer</h2>
-      <p>Animals, Food, Colors &amp; more!</p>
-    </a>
-    <a href="numbers.html" class="module-card numbers">
-      <div class="card-emoji">🔢</div>
-      <h2>Number Explorer</h2>
+    <!-- Module grid -->
+    <div class="module-grid">
+      <a href="#" onclick="showScreen('hangul'); return false;" class="module-card hangul">
+        <div class="card-emoji">🔤</div>
+        <h2>Hangul Explorer</h2>
+        <p>Learn Korean letters A-B-C!</p>
+      </a>
+      <a href="#" onclick="showScreen('words'); return false;" class="module-card words">
+        <div class="card-emoji">🐱</div>
+        <h2>Word Explorer</h2>
+        <p>Animals, Food, Colors &amp; more!</p>
+      </a>
+      <a href="#" onclick="showScreen('numbers'); return false;" class="module-card numbers">
+        <div class="card-emoji">🔢</div>
+        <h2>Number Explorer</h2>
+        <p>Count 1 to 20 in Korean!</p>
+      </a>
+      <a href="#" onclick="showScreen('phrases'); return false;" class="module-card phrases">
+        <div class="card-emoji">💬</div>
+        <h2>Phrase Explorer</h2>
+        <p>Say Hello, Thank you &amp; more!</p>
+      </a>
+      <a href="#" onclick="showScreen('games'); return false;" class="module-card games">
+        <div class="card-emoji">🎮</div>
+        <h2>Mini Games</h2>
+        <p>Play fun matching games!</p>
+      </a>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SCREEN: HANGUL                              -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-hangul" class="screen">
+  <main>
+    <div class="page-title">
+      <div class="page-emoji">🔤</div>
+      <h1>Hangul Explorer</h1>
+      <p>Learn Korean letters!</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showHangulTab('learn', this)">📖 Learn</button>
+      <button class="tab-btn" onclick="showHangulTab('trace', this)">✏️ Trace</button>
+      <button class="tab-btn" onclick="showHangulTab('match', this)">🎯 Match</button>
+    </div>
+
+    <!-- ── LEARN TAB ── -->
+    <div id="hangul-tab-learn" class="tab-content">
+      <!-- Sub-tabs for consonants / vowels -->
+      <div class="tabs" style="margin-top:0">
+        <button class="tab-btn active" onclick="showLetterGroup('consonants', this)" id="cons-btn">Consonants</button>
+        <button class="tab-btn" onclick="showLetterGroup('vowels', this)" id="vowels-btn">Vowels</button>
+      </div>
+
+      <!-- Letter browser grid -->
+      <div class="letter-grid" id="letter-grid"></div>
+
+      <!-- Large display card -->
+      <div class="card" style="margin-top:20px; padding:24px">
+        <div class="letter-showcase">
+          <div class="letter-big" id="big-letter" onclick="playCurrentLetter()" title="Click to hear!">ㄱ</div>
+          <div class="letter-info">
+            <div class="letter-romanization" id="letter-roman">g / k</div>
+            <div class="letter-name" id="letter-name">Giyeok</div>
+            <div class="letter-name" id="letter-example" style="font-size:1rem; color:#aaa"></div>
+            <div class="letter-nav">
+              <button class="btn btn-secondary btn-sm" onclick="prevLetter()">⬅ Prev</button>
+              <button class="btn btn-primary" onclick="playCurrentLetter()">🔊 Play Sound</button>
+              <button class="btn btn-purple btn-sm" onclick="nextLetter()">Next ➡</button>
+            </div>
+            <div style="margin-top:12px">
+              <button class="btn btn-accent" onclick="repeatAfterMe()">🗣️ Repeat After Me!</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRACE TAB ── -->
+    <div id="hangul-tab-trace" class="tab-content" style="display:none">
+      <div class="card" style="text-align:center; padding:24px">
+        <h2 style="color:var(--purple); margin-bottom:8px">✏️ Trace the Letter!</h2>
+        <p style="color:#888; margin-bottom:16px">Draw the letter with your finger or mouse</p>
+        <div style="font-size:5rem; color:var(--primary); margin-bottom:8px" id="trace-letter-display">ㄱ</div>
+        <canvas id="tracing-canvas" width="280" height="280"></canvas>
+        <div style="margin-top:16px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="playCurrentLetter()">🔊 Hear it</button>
+          <button class="btn btn-secondary" onclick="clearCanvas()">🗑️ Clear</button>
+          <button class="btn btn-green" onclick="doneTracing()">✅ Done!</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── MATCH TAB ── -->
+    <div id="hangul-tab-match" class="tab-content" style="display:none">
+      <div class="card" style="padding:24px">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:16px">
+          <h2 style="color:var(--purple)">🎯 Match the Letter!</h2>
+          <div>
+            Score: <strong id="match-score">0</strong> / <strong id="match-total">0</strong>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-bottom:20px">
+          <p style="font-size:1.1rem; color:#888; margin-bottom:8px">Match the Korean letter to its sound!</p>
+          <button class="btn btn-orange" onclick="startMatchGame()">🔄 New Game</button>
+        </div>
+
+        <div id="match-game-area">
+          <div class="match-area">
+            <div class="match-col" id="match-letters"></div>
+            <div style="display:flex; align-items:center; font-size:2rem; color:#ccc">↔</div>
+            <div class="match-col" id="match-sounds"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SCREEN: WORDS                               -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-words" class="screen">
+  <main>
+    <div class="page-title">
+      <div class="page-emoji">🐱</div>
+      <h1>Word Explorer</h1>
+      <p>Tap a word card to hear it! 🔊</p>
+    </div>
+
+    <!-- Category tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showCategory('animals', this)">🐾 Animals</button>
+      <button class="tab-btn" onclick="showCategory('food', this)">🍎 Food</button>
+      <button class="tab-btn" onclick="showCategory('colors', this)">🎨 Colors</button>
+      <button class="tab-btn" onclick="showCategory('numbers', this)">🔢 Numbers</button>
+      <button class="tab-btn" onclick="showCategory('family', this)">👨‍👩‍👧 Family</button>
+      <button class="tab-btn" onclick="showCategory('body', this)">👀 Body</button>
+    </div>
+
+    <div id="word-grid-container" class="word-grid"></div>
+
+    <!-- Word detail modal -->
+    <div id="word-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
+      <div class="card" style="max-width:340px; width:90%; text-align:center; padding:32px; position:relative;">
+        <button onclick="closeModal()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:1.5rem; cursor:pointer;">✕</button>
+        <div id="modal-emoji" style="font-size:5rem; margin-bottom:10px"></div>
+        <div id="modal-korean" style="font-size:2.5rem; color:var(--primary); font-weight:bold; margin-bottom:4px"></div>
+        <div id="modal-english" style="font-size:1.2rem; color:#888; margin-bottom:20px"></div>
+        <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="playModalWord()">🔊 Hear it!</button>
+          <button class="btn btn-accent" onclick="repeatModal()">🗣️ Repeat After Me!</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SCREEN: NUMBERS                             -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-numbers" class="screen">
+  <main>
+    <div class="page-title">
+      <div class="page-emoji">🔢</div>
+      <h1>Number Explorer</h1>
       <p>Count 1 to 20 in Korean!</p>
-    </a>
-    <a href="phrases.html" class="module-card phrases">
-      <div class="card-emoji">💬</div>
-      <h2>Phrase Explorer</h2>
-      <p>Say Hello, Thank you &amp; more!</p>
-    </a>
-    <a href="games.html" class="module-card games">
-      <div class="card-emoji">🎮</div>
-      <h2>Mini Games</h2>
-      <p>Play fun matching games!</p>
-    </a>
-  </div>
-</main>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showNumTab('learn', this)">📖 Learn</button>
+      <button class="tab-btn" onclick="showNumTab('count', this)">🌟 Count</button>
+      <button class="tab-btn" onclick="showNumTab('quiz', this)">❓ Quiz</button>
+    </div>
+
+    <!-- ── LEARN TAB ── -->
+    <div id="numbers-tab-learn" class="tab-content">
+      <div class="card" style="padding:28px; text-align:center">
+        <div class="number-display">
+          <div class="number-big" id="num-arabic"></div>
+          <div class="number-korean" id="num-korean"></div>
+          <div class="number-english" id="num-english"></div>
+          <div class="number-english" style="font-size:1rem; color:#bbb" id="num-native"></div>
+        </div>
+        <div class="counting-objects" id="counting-objects"></div>
+        <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px">
+          <button class="btn btn-secondary btn-sm" onclick="changeNum(-1)">⬅ Prev</button>
+          <button class="btn btn-primary" onclick="playNumber()">🔊 Hear it!</button>
+          <button class="btn btn-accent" onclick="repeatNumber()">🗣️ Repeat After Me!</button>
+          <button class="btn btn-secondary btn-sm" onclick="changeNum(1)">Next ➡</button>
+        </div>
+      </div>
+
+      <!-- Number grid -->
+      <div style="margin-top:20px">
+        <h3 style="color:var(--purple); margin-bottom:12px">All Numbers:</h3>
+        <div class="letter-grid" id="number-grid" style="grid-template-columns: repeat(auto-fill, minmax(70px,1fr))"></div>
+      </div>
+    </div>
+
+    <!-- ── COUNT TAB ── -->
+    <div id="numbers-tab-count" class="tab-content" style="display:none">
+      <div class="card" style="padding:24px; text-align:center">
+        <h2 style="color:var(--purple); margin-bottom:8px">How many? 🤔</h2>
+        <p style="color:#888; margin-bottom:16px">Count the objects and tap the right number!</p>
+        <button class="btn btn-orange" onclick="newCountQuestion()" style="margin-bottom:20px">🔄 New Question</button>
+
+        <div id="count-objects" class="counting-objects" style="font-size:3rem; margin:20px 0"></div>
+        <div id="count-question" style="font-size:1.3rem; color:#555; margin-bottom:16px"></div>
+        <div class="quiz-options" id="count-options"></div>
+      </div>
+    </div>
+
+    <!-- ── QUIZ TAB ── -->
+    <div id="numbers-tab-quiz" class="tab-content" style="display:none">
+      <div class="card" style="padding:24px; text-align:center">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px">
+          <h2 style="color:var(--purple)">Quiz Time! ❓</h2>
+          <div>Score: <strong id="num-quiz-score">0</strong> / <strong id="num-quiz-total">10</strong></div>
+        </div>
+        <button class="btn btn-orange" onclick="startQuiz()" style="margin-bottom:16px">🔄 New Quiz</button>
+
+        <div id="num-quiz-area">
+          <div id="num-quiz-prompt" style="font-size:1.3rem; color:#555; margin-bottom:8px"></div>
+          <div id="num-quiz-korean" style="font-size:3rem; color:var(--primary); font-weight:bold; margin-bottom:20px"></div>
+          <div class="quiz-options" id="num-quiz-options"></div>
+        </div>
+
+        <div id="num-quiz-done" style="display:none; padding:20px">
+          <div class="scoreboard">
+            <div class="score-big" id="num-quiz-final-score"></div>
+            <div class="score-label">out of 10</div>
+            <div class="stars-row" id="num-quiz-stars"></div>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="startQuiz()">Play Again! 🔄</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SCREEN: PHRASES                             -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-phrases" class="screen">
+  <main>
+    <div class="page-title">
+      <div class="page-emoji">💬</div>
+      <h1>Phrase Explorer</h1>
+      <p>Say hello and more in Korean! 🎙️</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showPhraseTab('learn', this)">📖 Learn</button>
+      <button class="tab-btn" onclick="showPhraseTab('match', this)">🎯 Match</button>
+    </div>
+
+    <!-- ── LEARN TAB ── -->
+    <div id="phrases-tab-learn" class="tab-content">
+      <div id="phrase-list" style="display:flex; flex-direction:column; gap:12px; margin-top:8px"></div>
+    </div>
+
+    <!-- ── MATCH TAB ── -->
+    <div id="phrases-tab-match" class="tab-content" style="display:none">
+      <div class="card" style="padding:24px">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px">
+          <h2 style="color:var(--purple)">🎯 Match the Phrases!</h2>
+          <div>Score: <strong id="pmatch-score">0</strong> / <strong id="pmatch-total">0</strong></div>
+        </div>
+        <p style="color:#888; margin-bottom:12px">Match the Korean phrase to its English meaning!</p>
+        <button class="btn btn-orange" onclick="startPhraseMatch()" style="margin-bottom:16px">🔄 New Game</button>
+        <div class="match-area">
+          <div class="match-col" id="pmatch-korean"></div>
+          <div style="display:flex; align-items:center; font-size:2rem; color:#ccc">↔</div>
+          <div class="match-col" id="pmatch-english"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SCREEN: GAMES                               -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="screen-games" class="screen">
+  <main>
+    <div class="page-title">
+      <div class="page-emoji">🎮</div>
+      <h1>Mini Games</h1>
+      <p>Play and learn Korean! 🌟</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showGameTab('memory', this)">🃏 Memory</button>
+      <button class="tab-btn" onclick="showGameTab('listen', this)">👂 Listen</button>
+      <button class="tab-btn" onclick="showGameTab('drag', this)">🖱️ Drag &amp; Drop</button>
+      <button class="tab-btn" onclick="showGameTab('quiz', this)">⭐ Star Quiz</button>
+    </div>
+
+    <!-- ── MEMORY CARD GAME ── -->
+    <div id="games-tab-memory" class="tab-content">
+      <div class="card" style="padding:24px">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px">
+          <h2 style="color:var(--purple)">🃏 Memory Card Game!</h2>
+          <div>Pairs: <strong id="mem-pairs">0</strong> / <strong id="mem-total">0</strong> &nbsp;|&nbsp; Tries: <strong id="mem-tries">0</strong></div>
+        </div>
+        <p style="color:#888; margin-bottom:12px">Find matching Korean word and picture pairs!</p>
+        <button class="btn btn-orange" onclick="startMemoryGame()">🔄 New Game</button>
+        <div class="memory-grid" id="memory-grid"></div>
+      </div>
+    </div>
+
+    <!-- ── LISTEN & CHOOSE ── -->
+    <div id="games-tab-listen" class="tab-content" style="display:none">
+      <div class="card" style="padding:24px; text-align:center">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px">
+          <h2 style="color:var(--purple)">👂 Listen &amp; Choose!</h2>
+          <div>Score: <strong id="listen-score">0</strong> / <strong id="listen-total">10</strong></div>
+        </div>
+        <p style="color:#888; margin-bottom:16px">Listen to the Korean word and pick the right picture!</p>
+        <button class="btn btn-primary btn-lg" id="listen-play-btn" onclick="playListenWord()" style="margin-bottom:20px">
+          🔊 Play Word!
+        </button>
+        <div class="listen-options" id="listen-options"></div>
+      </div>
+    </div>
+
+    <!-- ── DRAG & DROP ── -->
+    <div id="games-tab-drag" class="tab-content" style="display:none">
+      <div class="card" style="padding:24px">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px">
+          <h2 style="color:var(--purple)">🖱️ Drag &amp; Drop!</h2>
+          <div>Score: <strong id="drag-score">0</strong></div>
+        </div>
+        <p style="color:#888; margin-bottom:16px">Drag the Korean word to match the picture!</p>
+        <button class="btn btn-orange" onclick="startDragGame()" style="margin-bottom:20px">🔄 New Round</button>
+
+        <div class="drag-items-zone" id="drag-items"></div>
+        <div class="drag-zone" id="drag-targets"></div>
+      </div>
+    </div>
+
+    <!-- ── STAR QUIZ ── -->
+    <div id="games-tab-quiz" class="tab-content" style="display:none">
+      <div class="card" style="padding:24px; text-align:center">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px">
+          <h2 style="color:var(--purple)">⭐ Star Quiz!</h2>
+          <div>Question: <strong id="sq-q-num">1</strong> / 10</div>
+        </div>
+        <button class="btn btn-orange" onclick="startStarQuiz()" style="margin-bottom:16px">🔄 New Quiz</button>
+
+        <div id="sq-area">
+          <div id="sq-image" style="font-size:5rem; margin:10px 0"></div>
+          <div id="sq-question" style="font-size:1.2rem; color:#555; margin-bottom:16px"></div>
+          <div class="quiz-options" id="sq-options"></div>
+        </div>
+
+        <div id="sq-done" style="display:none">
+          <div class="scoreboard">
+            <div class="score-big" id="sq-final"></div>
+            <div class="score-label">out of 10</div>
+            <div class="stars-row" id="sq-stars"></div>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="startStarQuiz()">Play Again! 🔄</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
 
 <footer>
   <p>Made with ❤️ for little learners!</p>
   <p><a href="mailto:nomadongho@gmail.com?subject=Korean Explorer Feedback">✉️ Send feedback to developer</a></p>
 </footer>
 
+<div id="ad-banner"></div>
 <div id="toast"></div>
 
 <script src="js/audio.js"></script>
 <script src="js/progress.js"></script>
 <script src="js/app.js"></script>
+<script src="../shared/ad-manager.js"></script>
+<script src="js/ad-config.js"></script>
+<script src="js/ads.js"></script>
+<script>
+// ═══════════════════════════════════════════════
+// ── SCREEN ROUTING ───────────────────────────
+// ═══════════════════════════════════════════════
+const screenInited = new Set();
+
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('screen-' + name);
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+
+  if (!screenInited.has(name)) {
+    screenInited.add(name);
+    switch (name) {
+      case 'hangul':  initHangulScreen();  break;
+      case 'words':   initWordsScreen();   break;
+      case 'numbers': initNumbersScreen(); break;
+      case 'phrases': initPhrasesScreen(); break;
+      case 'games':   initGamesScreen();   break;
+    }
+  }
+
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════════
+// ── HANGUL SCREEN ────────────────────────────
+// ═══════════════════════════════════════════════
+const consonants = [
+  { char:'ㄱ', roman:'g/k',  name:'Giyeok',   example:'가 (ga)' },
+  { char:'ㄴ', roman:'n',    name:'Nieun',     example:'나 (na)' },
+  { char:'ㄷ', roman:'d/t',  name:'Digeut',    example:'다 (da)' },
+  { char:'ㄹ', roman:'r/l',  name:'Rieul',     example:'라 (ra)' },
+  { char:'ㅁ', roman:'m',    name:'Mieum',     example:'마 (ma)' },
+  { char:'ㅂ', roman:'b/p',  name:'Bieup',     example:'바 (ba)' },
+  { char:'ㅅ', roman:'s',    name:'Siot',      example:'사 (sa)' },
+  { char:'ㅇ', roman:'ng/-', name:'Ieung',     example:'아 (a)' },
+  { char:'ㅈ', roman:'j',    name:'Jieut',     example:'자 (ja)' },
+  { char:'ㅊ', roman:'ch',   name:'Chieut',    example:'차 (cha)' },
+  { char:'ㅋ', roman:'k',    name:'Kieuk',     example:'카 (ka)' },
+  { char:'ㅌ', roman:'t',    name:'Tieut',     example:'타 (ta)' },
+  { char:'ㅍ', roman:'p',    name:'Pieup',     example:'파 (pa)' },
+  { char:'ㅎ', roman:'h',    name:'Hieut',     example:'하 (ha)' },
+];
+
+const vowels = [
+  { char:'ㅏ', roman:'a',   name:'A',    example:'아 (a)' },
+  { char:'ㅑ', roman:'ya',  name:'Ya',   example:'야 (ya)' },
+  { char:'ㅓ', roman:'eo',  name:'Eo',   example:'어 (eo)' },
+  { char:'ㅕ', roman:'yeo', name:'Yeo',  example:'여 (yeo)' },
+  { char:'ㅗ', roman:'o',   name:'O',    example:'오 (o)' },
+  { char:'ㅛ', roman:'yo',  name:'Yo',   example:'요 (yo)' },
+  { char:'ㅜ', roman:'u',   name:'U',    example:'우 (u)' },
+  { char:'ㅠ', roman:'yu',  name:'Yu',   example:'유 (yu)' },
+  { char:'ㅡ', roman:'eu',  name:'Eu',   example:'으 (eu)' },
+  { char:'ㅣ', roman:'i',   name:'I',    example:'이 (i)' },
+];
+
+let currentGroup  = consonants;
+let currentIndex  = 0;
+let matchSelected = null;
+let matchScore    = 0;
+let matchTotal    = 0;
+let isDrawing = false;
+let lastX = 0, lastY = 0;
+
+function initHangulScreen() {
+  renderLetterGrid();
+  renderLetterCard();
+
+  const canvas = document.getElementById('tracing-canvas');
+  const ctx    = canvas.getContext('2d');
+  ctx.lineWidth   = 8;
+  ctx.lineCap     = 'round';
+  ctx.strokeStyle = '#FF6B6B';
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const src = e.touches ? e.touches[0] : e;
+    return {
+      x: (src.clientX - rect.left) * scaleX,
+      y: (src.clientY - rect.top)  * scaleY,
+    };
+  }
+
+  function startDraw(e) { e.preventDefault(); isDrawing = true; const p = getPos(e); lastX = p.x; lastY = p.y; }
+  function draw(e) {
+    e.preventDefault();
+    if (!isDrawing) return;
+    const p = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    lastX = p.x; lastY = p.y;
+  }
+  function stopDraw(e) { e.preventDefault(); isDrawing = false; }
+
+  canvas.addEventListener('mousedown',  startDraw);
+  canvas.addEventListener('mousemove',  draw);
+  canvas.addEventListener('mouseup',    stopDraw);
+  canvas.addEventListener('mouseleave', stopDraw);
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove',  draw,      { passive: false });
+  canvas.addEventListener('touchend',   stopDraw,  { passive: false });
+}
+
+function showHangulTab(tab, btn) {
+  const screen = document.getElementById('screen-hangul');
+  screen.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  screen.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('hangul-tab-' + tab).style.display = '';
+  btn.classList.add('active');
+
+  if (tab === 'match') startMatchGame();
+  if (tab === 'trace') renderTrace();
+}
+
+function showLetterGroup(group, btn) {
+  currentGroup = group === 'consonants' ? consonants : vowels;
+  currentIndex = 0;
+  document.querySelectorAll('#hangul-tab-learn .tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLetterGrid();
+  renderLetterCard();
+}
+
+function renderLetterGrid() {
+  const grid = document.getElementById('letter-grid');
+  grid.innerHTML = '';
+  currentGroup.forEach((l, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'letter-tile' + (i === currentIndex ? ' selected' : '');
+    tile.innerHTML = `<div class="lt-char">${l.char}</div><div class="lt-roman">${l.roman}</div>`;
+    tile.onclick = () => { currentIndex = i; renderLetterGrid(); renderLetterCard(); };
+    grid.appendChild(tile);
+  });
+}
+
+function renderLetterCard() {
+  const l = currentGroup[currentIndex];
+  document.getElementById('big-letter').textContent     = l.char;
+  document.getElementById('letter-roman').textContent   = l.roman;
+  document.getElementById('letter-name').textContent    = l.name;
+  document.getElementById('letter-example').textContent = l.example;
+  const traceEl = document.getElementById('trace-letter-display');
+  if (traceEl) traceEl.textContent = l.char;
+}
+
+function prevLetter() {
+  currentIndex = (currentIndex - 1 + currentGroup.length) % currentGroup.length;
+  renderLetterGrid();
+  renderLetterCard();
+}
+
+function nextLetter() {
+  currentIndex = (currentIndex + 1) % currentGroup.length;
+  renderLetterGrid();
+  renderLetterCard();
+}
+
+function playCurrentLetter() {
+  const l = currentGroup[currentIndex];
+  AudioManager.speakKorean(l.char);
+  popElement(document.getElementById('big-letter'));
+}
+
+function repeatAfterMe() {
+  const l = currentGroup[currentIndex];
+  AudioManager.speakEnglish('Say: ' + l.roman);
+  setTimeout(() => AudioManager.speakKorean(l.char), 1500);
+}
+
+function renderTrace() {
+  const l = currentGroup[currentIndex];
+  document.getElementById('trace-letter-display').textContent = l.char;
+  clearCanvas();
+}
+
+function clearCanvas() {
+  const canvas = document.getElementById('tracing-canvas');
+  const ctx    = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+function doneTracing() {
+  const result = ProgressManager.addPoints(10);
+  showToast('Great tracing! +10 points! 🌟', 'correct');
+  if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+  ProgressManager.addStar();
+}
+
+function startMatchGame() {
+  matchScore = 0;
+  matchTotal = 0;
+  matchSelected = null;
+  document.getElementById('match-score').textContent = 0;
+
+  const items = pickRandom(currentGroup, 5);
+  matchTotal  = items.length;
+  document.getElementById('match-total').textContent = matchTotal;
+
+  const letters = shuffle(items);
+  const sounds  = shuffle([...items]);
+
+  const leftCol  = document.getElementById('match-letters');
+  const rightCol = document.getElementById('match-sounds');
+  leftCol.innerHTML  = '';
+  rightCol.innerHTML = '';
+
+  letters.forEach(l => {
+    const el = document.createElement('div');
+    el.className = 'match-item';
+    el.textContent = l.char;
+    el.dataset.char = l.char;
+    el.dataset.side = 'letter';
+    el.onclick = () => handleMatchClick(el);
+    leftCol.appendChild(el);
+  });
+
+  sounds.forEach(l => {
+    const el = document.createElement('div');
+    el.className = 'match-item';
+    el.textContent = l.roman + ' (' + l.name + ')';
+    el.dataset.char = l.char;
+    el.dataset.side = 'sound';
+    el.onclick = () => handleMatchClick(el);
+    rightCol.appendChild(el);
+  });
+}
+
+function handleMatchClick(el) {
+  if (el.classList.contains('matched')) return;
+
+  if (!matchSelected) {
+    matchSelected = el;
+    el.classList.add('selected');
+    AudioManager.speakKorean(el.dataset.char);
+    return;
+  }
+
+  if (matchSelected === el) {
+    el.classList.remove('selected');
+    matchSelected = null;
+    return;
+  }
+
+  if (matchSelected.dataset.side === el.dataset.side) {
+    matchSelected.classList.remove('selected');
+    matchSelected = el;
+    el.classList.add('selected');
+    AudioManager.speakKorean(el.dataset.char);
+    return;
+  }
+
+  if (matchSelected.dataset.char === el.dataset.char) {
+    matchSelected.classList.remove('selected');
+    matchSelected.classList.add('matched');
+    el.classList.add('matched');
+    matchScore++;
+    document.getElementById('match-score').textContent = matchScore;
+    AudioManager.speakKorean(el.dataset.char);
+    showToast('Correct! 🎉 +10 pts', 'correct');
+    const result = ProgressManager.addPoints(10);
+    if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+
+    if (matchScore === matchTotal) {
+      setTimeout(() => {
+        showToast('All matched! You are amazing! ⭐', 'star', 3000);
+        launchConfetti();
+        ProgressManager.addStar();
+      }, 600);
+    }
+  } else {
+    matchSelected.classList.remove('selected');
+    matchSelected.classList.add('wrong');
+    el.classList.add('wrong');
+    setTimeout(() => {
+      matchSelected.classList.remove('wrong');
+      el.classList.remove('wrong');
+    }, 800);
+    showToast('Try again! 🙂', 'wrong');
+    AudioManager.speakEnglish('Try again');
+  }
+  matchSelected = null;
+}
+
+// ═══════════════════════════════════════════════
+// ── WORDS SCREEN ────────────────────────────
+// ═══════════════════════════════════════════════
+const wordData = {
+  animals: [
+    { emoji:'🐱', korean:'고양이', english:'Cat' },
+    { emoji:'🐶', korean:'강아지', english:'Dog' },
+    { emoji:'🐰', korean:'토끼',   english:'Rabbit' },
+    { emoji:'🐻', korean:'곰',     english:'Bear' },
+    { emoji:'🐘', korean:'코끼리', english:'Elephant' },
+    { emoji:'🐸', korean:'개구리', english:'Frog' },
+    { emoji:'🐯', korean:'호랑이', english:'Tiger' },
+    { emoji:'🐧', korean:'펭귄',   english:'Penguin' },
+    { emoji:'🦁', korean:'사자',   english:'Lion' },
+    { emoji:'🐔', korean:'닭',     english:'Chicken' },
+    { emoji:'🐄', korean:'소',     english:'Cow' },
+    { emoji:'🐷', korean:'돼지',   english:'Pig' },
+  ],
+  food: [
+    { emoji:'🍎', korean:'사과',   english:'Apple' },
+    { emoji:'🍌', korean:'바나나', english:'Banana' },
+    { emoji:'🍊', korean:'오렌지', english:'Orange' },
+    { emoji:'🍇', korean:'포도',   english:'Grapes' },
+    { emoji:'🍚', korean:'밥',     english:'Rice' },
+    { emoji:'🍜', korean:'국수',   english:'Noodles' },
+    { emoji:'🥚', korean:'달걀',   english:'Egg' },
+    { emoji:'🥛', korean:'우유',   english:'Milk' },
+    { emoji:'🍰', korean:'케이크', english:'Cake' },
+    { emoji:'🍬', korean:'사탕',   english:'Candy' },
+    { emoji:'🥐', korean:'빵',     english:'Bread' },
+    { emoji:'🧃', korean:'주스',   english:'Juice' },
+  ],
+  colors: [
+    { emoji:'🔴', korean:'빨간색', english:'Red' },
+    { emoji:'🔵', korean:'파란색', english:'Blue' },
+    { emoji:'🟡', korean:'노란색', english:'Yellow' },
+    { emoji:'🟢', korean:'초록색', english:'Green' },
+    { emoji:'🟠', korean:'주황색', english:'Orange' },
+    { emoji:'🟣', korean:'보라색', english:'Purple' },
+    { emoji:'⚫', korean:'검은색', english:'Black' },
+    { emoji:'⚪', korean:'흰색',   english:'White' },
+    { emoji:'🩷', korean:'분홍색', english:'Pink' },
+    { emoji:'🟫', korean:'갈색',   english:'Brown' },
+  ],
+  numbers: [
+    { emoji:'1️⃣', korean:'일', english:'One' },
+    { emoji:'2️⃣', korean:'이', english:'Two' },
+    { emoji:'3️⃣', korean:'삼', english:'Three' },
+    { emoji:'4️⃣', korean:'사', english:'Four' },
+    { emoji:'5️⃣', korean:'오', english:'Five' },
+    { emoji:'6️⃣', korean:'육', english:'Six' },
+    { emoji:'7️⃣', korean:'칠', english:'Seven' },
+    { emoji:'8️⃣', korean:'팔', english:'Eight' },
+    { emoji:'9️⃣', korean:'구', english:'Nine' },
+    { emoji:'🔟', korean:'십', english:'Ten' },
+  ],
+  family: [
+    { emoji:'👨',       korean:'아빠',     english:'Dad' },
+    { emoji:'👩',       korean:'엄마',     english:'Mom' },
+    { emoji:'👦',       korean:'남동생',   english:'Little Brother' },
+    { emoji:'👧',       korean:'여동생',   english:'Little Sister' },
+    { emoji:'👴',       korean:'할아버지', english:'Grandfather' },
+    { emoji:'👵',       korean:'할머니',   english:'Grandmother' },
+    { emoji:'🧑',       korean:'나',       english:'Me' },
+    { emoji:'👨‍👩‍👧‍👦', korean:'가족',     english:'Family' },
+  ],
+  body: [
+    { emoji:'👀', korean:'눈',   english:'Eyes' },
+    { emoji:'👂', korean:'귀',   english:'Ear' },
+    { emoji:'👃', korean:'코',   english:'Nose' },
+    { emoji:'👄', korean:'입',   english:'Mouth' },
+    { emoji:'🤚', korean:'손',   english:'Hand' },
+    { emoji:'🦶', korean:'발',   english:'Foot' },
+    { emoji:'💇', korean:'머리', english:'Head' },
+    { emoji:'💪', korean:'팔',   english:'Arm' },
+    { emoji:'🦵', korean:'다리', english:'Leg' },
+    { emoji:'❤️', korean:'심장', english:'Heart' },
+  ],
+};
+
+let modalWord = null;
+
+function initWordsScreen() {
+  showCategory('animals', document.querySelector('#screen-words .tabs .tab-btn'));
+}
+
+function showCategory(cat, btn) {
+  document.querySelectorAll('#screen-words .tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const grid = document.getElementById('word-grid-container');
+  grid.innerHTML = '';
+  const words = wordData[cat];
+
+  words.forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'word-card';
+    card.innerHTML = `
+      <div class="word-emoji">${w.emoji}</div>
+      <div class="word-korean">${w.korean}</div>
+      <div class="word-english">${w.english}</div>
+    `;
+    card.onclick = () => openModal(w);
+    grid.appendChild(card);
+  });
+}
+
+function openModal(w) {
+  modalWord = w;
+  document.getElementById('modal-emoji').textContent   = w.emoji;
+  document.getElementById('modal-korean').textContent  = w.korean;
+  document.getElementById('modal-english').textContent = w.english;
+
+  const modal = document.getElementById('word-modal');
+  modal.style.display = 'flex';
+  AudioManager.speakKorean(w.korean);
+
+  const result = ProgressManager.addPoints(5);
+  if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+}
+
+function closeModal() {
+  document.getElementById('word-modal').style.display = 'none';
+}
+
+function playModalWord() {
+  if (modalWord) AudioManager.speakKorean(modalWord.korean);
+}
+
+function repeatModal() {
+  if (!modalWord) return;
+  AudioManager.speakEnglish('Say: ' + modalWord.english);
+  setTimeout(() => AudioManager.speakKorean(modalWord.korean), 1800);
+  showToast('🗣️ Say it out loud!', 'info');
+}
+
+document.getElementById('word-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ═══════════════════════════════════════════════
+// ── NUMBERS SCREEN ───────────────────────────
+// ═══════════════════════════════════════════════
+const numbers = [
+  { n:1,  korean:'일',   native:'하나',   english:'One' },
+  { n:2,  korean:'이',   native:'둘',     english:'Two' },
+  { n:3,  korean:'삼',   native:'셋',     english:'Three' },
+  { n:4,  korean:'사',   native:'넷',     english:'Four' },
+  { n:5,  korean:'오',   native:'다섯',   english:'Five' },
+  { n:6,  korean:'육',   native:'여섯',   english:'Six' },
+  { n:7,  korean:'칠',   native:'일곱',   english:'Seven' },
+  { n:8,  korean:'팔',   native:'여덟',   english:'Eight' },
+  { n:9,  korean:'구',   native:'아홉',   english:'Nine' },
+  { n:10, korean:'십',   native:'열',     english:'Ten' },
+  { n:11, korean:'십일', native:'열하나', english:'Eleven' },
+  { n:12, korean:'십이', native:'열둘',   english:'Twelve' },
+  { n:13, korean:'십삼', native:'열셋',   english:'Thirteen' },
+  { n:14, korean:'십사', native:'열넷',   english:'Fourteen' },
+  { n:15, korean:'십오', native:'열다섯', english:'Fifteen' },
+  { n:16, korean:'십육', native:'열여섯', english:'Sixteen' },
+  { n:17, korean:'십칠', native:'열일곱', english:'Seventeen' },
+  { n:18, korean:'십팔', native:'열여덟', english:'Eighteen' },
+  { n:19, korean:'십구', native:'열아홉', english:'Nineteen' },
+  { n:20, korean:'이십', native:'스물',   english:'Twenty' },
+];
+
+const countEmojis = ['⭐','🍎','🐱','🎈','🌸','🦋','🍬','🐶','🌟','🎯'];
+let currentNumIndex = 0;
+let numQuizIndex    = 0;
+let numQuizScore    = 0;
+let numQuizAnswered = false;
+
+function initNumbersScreen() {
+  renderNumberGrid();
+  renderNumber();
+}
+
+function showNumTab(tab, btn) {
+  const screen = document.getElementById('screen-numbers');
+  screen.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  screen.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('numbers-tab-' + tab).style.display = '';
+  btn.classList.add('active');
+
+  if (tab === 'count') newCountQuestion();
+  if (tab === 'quiz')  startQuiz();
+}
+
+function renderNumber() {
+  const num = numbers[currentNumIndex];
+  document.getElementById('num-arabic').textContent  = num.n;
+  document.getElementById('num-korean').textContent  = num.korean;
+  document.getElementById('num-english').textContent = num.english;
+  document.getElementById('num-native').textContent  = '(native: ' + num.native + ')';
+
+  const emoji = countEmojis[currentNumIndex % countEmojis.length];
+  document.getElementById('counting-objects').textContent = emoji.repeat(num.n);
+
+  document.querySelectorAll('.num-tile').forEach((t, i) => {
+    t.classList.toggle('selected', i === currentNumIndex);
+  });
+}
+
+function changeNum(dir) {
+  currentNumIndex = (currentNumIndex + dir + numbers.length) % numbers.length;
+  renderNumber();
+}
+
+function playNumber() {
+  const num = numbers[currentNumIndex];
+  AudioManager.speakKorean(num.korean);
+  const result = ProgressManager.addPoints(5);
+  if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+}
+
+function repeatNumber() {
+  const num = numbers[currentNumIndex];
+  AudioManager.speakEnglish('The number ' + num.n + ' in Korean is: ');
+  setTimeout(() => AudioManager.speakKorean(num.korean), 1600);
+  showToast('🗣️ Say it!', 'info');
+}
+
+function renderNumberGrid() {
+  const grid = document.getElementById('number-grid');
+  grid.innerHTML = '';
+  numbers.forEach((num, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'letter-tile num-tile' + (i === 0 ? ' selected' : '');
+    tile.innerHTML = `<div class="lt-char" style="font-size:1.2rem">${num.n}</div><div class="lt-roman">${num.korean}</div>`;
+    tile.onclick = () => { currentNumIndex = i; renderNumber(); };
+    grid.appendChild(tile);
+  });
+}
+
+function newCountQuestion() {
+  const num = numbers[Math.floor(Math.random() * 10)];
+  const emoji = countEmojis[Math.floor(Math.random() * countEmojis.length)];
+  document.getElementById('count-objects').textContent  = emoji.repeat(num.n);
+  document.getElementById('count-question').textContent = `How many ${emoji} do you see?`;
+
+  const opts      = generateNumOptions(num, 4);
+  const container = document.getElementById('count-options');
+  container.innerHTML = '';
+  container.dataset.answered = '';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = o.korean + ' (' + o.n + ')';
+    btn.onclick = () => checkCountAnswer(btn, o, num, container);
+    container.appendChild(btn);
+  });
+}
+
+function checkCountAnswer(btn, chosen, correct, container) {
+  if (container.dataset.answered) return;
+  container.dataset.answered = 'true';
+
+  if (chosen.n === correct.n) {
+    btn.classList.add('correct');
+    showToast('Correct! 🎉 +10 pts', 'correct');
+    AudioManager.speakKorean(correct.korean);
+    const result = ProgressManager.addPoints(10);
+    if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+    setTimeout(() => { container.dataset.answered = ''; newCountQuestion(); }, 1200);
+  } else {
+    btn.classList.add('wrong');
+    showToast('Not quite! Try again 🙂', 'wrong');
+    AudioManager.speakEnglish('Try again');
+    setTimeout(() => {
+      btn.classList.remove('wrong');
+      container.dataset.answered = '';
+    }, 1000);
+  }
+}
+
+function startQuiz() {
+  numQuizScore    = 0;
+  numQuizIndex    = 0;
+  numQuizAnswered = false;
+  document.getElementById('num-quiz-score').textContent = 0;
+  document.getElementById('num-quiz-total').textContent = 10;
+  document.getElementById('num-quiz-area').style.display = '';
+  document.getElementById('num-quiz-done').style.display = 'none';
+  nextQuizQuestion();
+}
+
+function nextQuizQuestion() {
+  if (numQuizIndex >= 10) { finishQuiz(); return; }
+  numQuizAnswered = false;
+
+  const correct = numbers[Math.floor(Math.random() * numbers.length)];
+  const mode    = Math.random() < 0.5 ? 'korean-to-number' : 'number-to-korean';
+
+  if (mode === 'korean-to-number') {
+    document.getElementById('num-quiz-prompt').textContent  = 'What number is this? 🤔';
+    document.getElementById('num-quiz-korean').textContent  = correct.korean;
+    const opts = generateNumOptions(correct, 4);
+    renderNumQuizOptions(opts, o => o.n, correct.n);
+  } else {
+    document.getElementById('num-quiz-prompt').textContent  = 'How do you say ' + correct.n + ' in Korean?';
+    document.getElementById('num-quiz-korean').textContent  = correct.n;
+    const opts = generateNumOptions(correct, 4);
+    renderNumQuizOptions(opts, o => o.korean, correct.korean);
+  }
+
+  AudioManager.speakKorean(correct.korean);
+}
+
+function renderNumQuizOptions(opts, labelFn, correctValue) {
+  const container = document.getElementById('num-quiz-options');
+  container.innerHTML = '';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = labelFn(o);
+    btn.onclick = () => checkNumQuizAnswer(btn, labelFn(o), correctValue, container);
+    container.appendChild(btn);
+  });
+}
+
+function checkNumQuizAnswer(btn, chosen, correct, container) {
+  if (numQuizAnswered) return;
+  numQuizAnswered = true;
+
+  if (String(chosen) === String(correct)) {
+    btn.classList.add('correct');
+    showToast('Correct! 🎉 +10 pts', 'correct');
+    numQuizScore++;
+    document.getElementById('num-quiz-score').textContent = numQuizScore;
+    const result = ProgressManager.addPoints(10);
+    if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+  } else {
+    btn.classList.add('wrong');
+    showToast('Not quite! 🙂', 'wrong');
+    container.querySelectorAll('.quiz-option').forEach(b => {
+      if (String(b.textContent).trim() === String(correct)) b.classList.add('correct');
+    });
+  }
+  numQuizIndex++;
+  setTimeout(nextQuizQuestion, 1400);
+}
+
+function finishQuiz() {
+  document.getElementById('num-quiz-area').style.display = 'none';
+  document.getElementById('num-quiz-done').style.display = '';
+  document.getElementById('num-quiz-final-score').textContent = numQuizScore;
+  const starsCount = Math.round((numQuizScore / 10) * 3);
+  document.getElementById('num-quiz-stars').textContent = '⭐'.repeat(starsCount);
+  if (numQuizScore >= 7) { launchConfetti(); }
+  if (starsCount > 0) ProgressManager.addStar();
+}
+
+function generateNumOptions(correct, count) {
+  const opts = [correct];
+  while (opts.length < count) {
+    const rand = numbers[Math.floor(Math.random() * numbers.length)];
+    if (!opts.find(o => o.n === rand.n)) opts.push(rand);
+  }
+  return shuffle(opts);
+}
+
+// ═══════════════════════════════════════════════
+// ── PHRASES SCREEN ───────────────────────────
+// ═══════════════════════════════════════════════
+const phrases = [
+  { emoji:'👋', korean:'안녕하세요',           roman:'An-nyeong-ha-se-yo',          english:'Hello' },
+  { emoji:'🙏', korean:'감사합니다',            roman:'Gam-sa-ham-ni-da',            english:'Thank you' },
+  { emoji:'👋', korean:'안녕',                 roman:'An-nyeong',                   english:'Bye / Hi (casual)' },
+  { emoji:'✅', korean:'네',                   roman:'Ne',                          english:'Yes' },
+  { emoji:'❌', korean:'아니요',               roman:'A-ni-yo',                     english:'No' },
+  { emoji:'😊', korean:'괜찮아요',             roman:'Gwaen-chan-a-yo',              english:"I'm okay / It's okay" },
+  { emoji:'🙂', korean:'제 이름은 ___ 이에요',  roman:'Je i-reum-eun ___ i-e-yo',    english:'My name is ___' },
+  { emoji:'🎂', korean:'저는 다섯 살이에요',    roman:'Jeo-neun da-seot sal-i-e-yo', english:'I am 5 years old' },
+  { emoji:'❓', korean:'이게 뭐예요?',          roman:'I-ge mwo-ye-yo?',             english:'What is this?' },
+  { emoji:'🍽️', korean:'맛있어요',              roman:'Ma-si-sseo-yo',               english:"It's delicious!" },
+  { emoji:'😢', korean:'미안해요',              roman:'Mi-an-hae-yo',                english:"I'm sorry" },
+  { emoji:'🤝', korean:'잘 부탁해요',           roman:'Jal bu-tak-hae-yo',           english:'Nice to meet you' },
+  { emoji:'🌙', korean:'안녕히 주무세요',       roman:'An-nyeong-hi ju-mu-se-yo',    english:'Good night' },
+  { emoji:'☀️', korean:'안녕히 계세요',         roman:'An-nyeong-hi gye-se-yo',      english:'Goodbye (to one staying)' },
+  { emoji:'❤️', korean:'사랑해요',              roman:'Sa-rang-hae-yo',              english:'I love you' },
+];
+
+let pmatchSelected = null;
+let pmatchScore    = 0;
+let pmatchTotal    = 0;
+
+function initPhrasesScreen() {
+  renderPhraseList();
+}
+
+function showPhraseTab(tab, btn) {
+  const screen = document.getElementById('screen-phrases');
+  screen.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  screen.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('phrases-tab-' + tab).style.display = '';
+  btn.classList.add('active');
+  if (tab === 'match') startPhraseMatch();
+}
+
+function renderPhraseList() {
+  const list = document.getElementById('phrase-list');
+  list.innerHTML = '';
+  phrases.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'phrase-card';
+    card.innerHTML = `
+      <div class="phrase-emoji">${p.emoji}</div>
+      <div style="flex:1">
+        <div class="phrase-korean">${p.korean}</div>
+        <div class="phrase-roman">${p.roman}</div>
+        <div class="phrase-english">${p.english}</div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); playPhrase('${p.korean.replace(/'/g, "\\'")}')">🔊 Hear</button>
+        <button class="btn btn-accent btn-sm" onclick="event.stopPropagation(); repeatPhrase('${p.korean.replace(/'/g, "\\'")}', '${p.roman.replace(/'/g, "\\'")}')">🗣️ Repeat</button>
+      </div>
+    `;
+    card.onclick = () => {
+      playPhrase(p.korean);
+      const result = ProgressManager.addPoints(5);
+      if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+    };
+    list.appendChild(card);
+  });
+}
+
+function playPhrase(korean) {
+  AudioManager.speakKorean(korean, 0.75);
+}
+
+function repeatPhrase(korean, roman) {
+  AudioManager.speakEnglish('Say: ' + roman);
+  setTimeout(() => AudioManager.speakKorean(korean, 0.7), 2000);
+  showToast('🗣️ Repeat after me!', 'info');
+}
+
+function startPhraseMatch() {
+  pmatchScore    = 0;
+  pmatchTotal    = 0;
+  pmatchSelected = null;
+  document.getElementById('pmatch-score').textContent = 0;
+
+  const items = pickRandom(phrases, 5);
+  pmatchTotal = items.length;
+  document.getElementById('pmatch-total').textContent = pmatchTotal;
+
+  const koreanSide  = shuffle([...items]);
+  const englishSide = shuffle([...items]);
+
+  const kCol = document.getElementById('pmatch-korean');
+  const eCol = document.getElementById('pmatch-english');
+  kCol.innerHTML = '';
+  eCol.innerHTML = '';
+
+  koreanSide.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'match-item';
+    el.textContent = p.korean;
+    el.dataset.key  = p.korean;
+    el.dataset.side = 'korean';
+    el.onclick = () => handlePhraseMatch(el);
+    kCol.appendChild(el);
+  });
+
+  englishSide.forEach(p => {
+    const el = document.createElement('div');
+    el.className = 'match-item';
+    el.textContent = p.english;
+    el.dataset.key  = p.korean;
+    el.dataset.side = 'english';
+    el.onclick = () => handlePhraseMatch(el);
+    eCol.appendChild(el);
+  });
+}
+
+function handlePhraseMatch(el) {
+  if (el.classList.contains('matched')) return;
+
+  if (!pmatchSelected) {
+    pmatchSelected = el;
+    el.classList.add('selected');
+    if (el.dataset.side === 'korean') AudioManager.speakKorean(el.dataset.key, 0.75);
+    return;
+  }
+
+  if (pmatchSelected === el) {
+    el.classList.remove('selected');
+    pmatchSelected = null;
+    return;
+  }
+
+  if (pmatchSelected.dataset.side === el.dataset.side) {
+    pmatchSelected.classList.remove('selected');
+    pmatchSelected = el;
+    el.classList.add('selected');
+    if (el.dataset.side === 'korean') AudioManager.speakKorean(el.dataset.key, 0.75);
+    return;
+  }
+
+  if (pmatchSelected.dataset.key === el.dataset.key) {
+    pmatchSelected.classList.remove('selected');
+    pmatchSelected.classList.add('matched');
+    el.classList.add('matched');
+    pmatchScore++;
+    document.getElementById('pmatch-score').textContent = pmatchScore;
+    AudioManager.speakKorean(el.dataset.key, 0.75);
+    showToast('Correct! 🎉 +10 pts', 'correct');
+    const result = ProgressManager.addPoints(10);
+    if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+
+    if (pmatchScore === pmatchTotal) {
+      setTimeout(() => {
+        showToast('All matched! Awesome! ⭐', 'star', 3000);
+        launchConfetti();
+        ProgressManager.addStar();
+      }, 600);
+    }
+  } else {
+    pmatchSelected.classList.remove('selected');
+    pmatchSelected.classList.add('wrong');
+    el.classList.add('wrong');
+    showToast('Try again! 🙂', 'wrong');
+    AudioManager.speakEnglish('Try again');
+    setTimeout(() => {
+      pmatchSelected.classList.remove('wrong');
+      el.classList.remove('wrong');
+    }, 800);
+  }
+  pmatchSelected = null;
+}
+
+// ═══════════════════════════════════════════════
+// ── GAMES SCREEN ────────────────────────────
+// ═══════════════════════════════════════════════
+const gameWords = [
+  { emoji:'🐱', korean:'고양이', english:'Cat' },
+  { emoji:'🐶', korean:'강아지', english:'Dog' },
+  { emoji:'🐰', korean:'토끼',   english:'Rabbit' },
+  { emoji:'🐻', korean:'곰',     english:'Bear' },
+  { emoji:'🍎', korean:'사과',   english:'Apple' },
+  { emoji:'🍌', korean:'바나나', english:'Banana' },
+  { emoji:'🔴', korean:'빨간색', english:'Red' },
+  { emoji:'🔵', korean:'파란색', english:'Blue' },
+  { emoji:'👨', korean:'아빠',   english:'Dad' },
+  { emoji:'��', korean:'엄마',   english:'Mom' },
+  { emoji:'👀', korean:'눈',     english:'Eyes' },
+  { emoji:'👄', korean:'입',     english:'Mouth' },
+];
+
+function initGamesScreen() {
+  startMemoryGame();
+}
+
+function showGameTab(tab, btn) {
+  const screen = document.getElementById('screen-games');
+  screen.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  screen.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('games-tab-' + tab).style.display = '';
+  btn.classList.add('active');
+
+  if (tab === 'memory') startMemoryGame();
+  if (tab === 'listen') startListenGame();
+  if (tab === 'drag')   startDragGame();
+  if (tab === 'quiz')   startStarQuiz();
+}
+
+// ── Memory Card Game ──────────────────────────
+let memPairs   = 0;
+let memTries   = 0;
+let memFlipped = [];
+let memLocked  = false;
+let memMatched = 0;
+
+function startMemoryGame() {
+  memPairs   = 0;
+  memTries   = 0;
+  memFlipped = [];
+  memLocked  = false;
+  memMatched = 0;
+
+  const items = pickRandom(gameWords, 6);
+  const total = items.length;
+  document.getElementById('mem-pairs').textContent = 0;
+  document.getElementById('mem-total').textContent = total;
+  document.getElementById('mem-tries').textContent = 0;
+
+  const cards = [];
+  items.forEach((w, i) => {
+    cards.push({ id: i, type: 'emoji',  content: w.emoji,  korean: w.korean, english: w.english });
+    cards.push({ id: i, type: 'korean', content: w.korean, korean: w.korean, english: w.english });
+  });
+  const shuffled = shuffle(cards);
+
+  const grid = document.getElementById('memory-grid');
+  grid.innerHTML = '';
+  shuffled.forEach((card, idx) => {
+    const el = document.createElement('div');
+    el.className = 'mem-card';
+    el.dataset.id   = card.id;
+    el.dataset.type = card.type;
+    el.dataset.idx  = idx;
+    el.innerHTML = `
+      <div class="mem-back">🎴</div>
+      <div class="mem-front">
+        ${card.type === 'emoji'
+          ? `<div style="font-size:2.5rem">${card.content}</div><div style="font-size:0.75rem;color:#888">${card.english}</div>`
+          : `<div style="font-size:1.4rem;color:var(--primary);font-weight:bold">${card.content}</div>`
+        }
+      </div>`;
+    el.onclick = () => flipMemCard(el, card);
+    grid.appendChild(el);
+  });
+}
+
+function flipMemCard(el, card) {
+  if (memLocked) return;
+  if (el.classList.contains('flipped') || el.classList.contains('matched')) return;
+
+  el.classList.add('flipped');
+  if (card.type === 'korean') AudioManager.speakKorean(card.korean);
+  memFlipped.push({ el, card });
+
+  if (memFlipped.length === 2) {
+    memLocked = true;
+    memTries++;
+    document.getElementById('mem-tries').textContent = memTries;
+
+    const [a, b] = memFlipped;
+    if (a.card.id === b.card.id && a.card.type !== b.card.type) {
+      a.el.classList.add('matched');
+      b.el.classList.add('matched');
+      memMatched++;
+      document.getElementById('mem-pairs').textContent = memMatched;
+
+      const total = parseInt(document.getElementById('mem-total').textContent);
+      if (memMatched === total) {
+        setTimeout(() => {
+          showToast('All pairs found! Amazing! 🌟', 'star', 3000);
+          launchConfetti();
+          ProgressManager.addStar();
+          const result = ProgressManager.addPoints(30);
+          if (result.leveledUp) showToast('Level Up! 🎉', 'star', 3000);
+        }, 400);
+      } else {
+        showToast('Match! +10 pts 🎉', 'correct');
+        const result = ProgressManager.addPoints(10);
+        if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+      }
+      memFlipped = [];
+      memLocked  = false;
+    } else {
+      showToast('Not a match! 🙂', 'wrong');
+      setTimeout(() => {
+        a.el.classList.remove('flipped');
+        b.el.classList.remove('flipped');
+        memFlipped = [];
+        memLocked  = false;
+      }, 1000);
+    }
+  }
+}
+
+// ── Listen & Choose ───────────────────────────
+let listenIndex    = 0;
+let listenScore    = 0;
+let listenWord     = null;
+let listenAnswered = false;
+
+function startListenGame() {
+  listenIndex    = 0;
+  listenScore    = 0;
+  listenAnswered = false;
+  document.getElementById('listen-score').textContent = 0;
+  document.getElementById('listen-total').textContent = 10;
+  nextListenQuestion();
+}
+
+function nextListenQuestion() {
+  if (listenIndex >= 10) {
+    showToast('Great job! 🌟 Game over!', 'star', 3000);
+    if (listenScore >= 7) { launchConfetti(); ProgressManager.addStar(); }
+    return;
+  }
+  listenAnswered = false;
+  listenWord     = gameWords[Math.floor(Math.random() * gameWords.length)];
+  const opts     = pickRandom(gameWords.filter(w => w.korean !== listenWord.korean), 3);
+  opts.push(listenWord);
+  const shuffled = shuffle(opts);
+
+  const container = document.getElementById('listen-options');
+  container.innerHTML = '';
+  shuffled.forEach(w => {
+    const btn = document.createElement('button');
+    btn.className = 'listen-option';
+    btn.innerHTML = `<div style="font-size:2.5rem">${w.emoji}</div><div style="font-size:0.9rem;color:#888">${w.english}</div>`;
+    btn.onclick = () => checkListenAnswer(btn, w, container);
+    container.appendChild(btn);
+  });
+}
+
+function playListenWord() {
+  if (listenWord) AudioManager.speakKorean(listenWord.korean);
+}
+
+function checkListenAnswer(btn, chosen, container) {
+  if (listenAnswered) return;
+  listenAnswered = true;
+
+  if (chosen.korean === listenWord.korean) {
+    btn.classList.add('correct');
+    showToast('Correct! 🎉 +10 pts', 'correct');
+    listenScore++;
+    document.getElementById('listen-score').textContent = listenScore;
+    const result = ProgressManager.addPoints(10);
+    if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+  } else {
+    btn.classList.add('wrong');
+    showToast('Not quite! 🙂', 'wrong');
+  }
+
+  listenIndex++;
+  setTimeout(() => {
+    nextListenQuestion();
+    setTimeout(playListenWord, 400);
+  }, 1200);
+}
+
+// ── Drag & Drop ───────────────────────────────
+let dragScore      = 0;
+let dragItems_data = [];
+let draggedEl      = null;
+
+function startDragGame() {
+  dragScore = 0;
+  document.getElementById('drag-score').textContent = 0;
+
+  const items = pickRandom(gameWords, 4);
+  dragItems_data = items;
+
+  const itemsZone = document.getElementById('drag-items');
+  itemsZone.innerHTML = '';
+  shuffle([...items]).forEach(w => {
+    const el = document.createElement('div');
+    el.className = 'drag-item';
+    el.textContent = w.korean;
+    el.draggable = true;
+    el.dataset.korean = w.korean;
+
+    el.addEventListener('dragstart', e => {
+      draggedEl = el;
+      e.dataTransfer.setData('text/plain', w.korean);
+      setTimeout(() => el.style.opacity = '0.5', 0);
+    });
+    el.addEventListener('dragend', () => { el.style.opacity = '1'; draggedEl = null; });
+    el.addEventListener('touchstart', () => { draggedEl = el; el.style.opacity = '0.5'; }, { passive: true });
+
+    itemsZone.appendChild(el);
+  });
+
+  const targetsZone = document.getElementById('drag-targets');
+  targetsZone.innerHTML = '';
+  items.forEach(w => {
+    const slot = document.createElement('div');
+    slot.className = 'drop-slot';
+    slot.dataset.korean = w.korean;
+    slot.innerHTML = `<div style="font-size:2.5rem">${w.emoji}</div><div class="slot-label">${w.english}</div>`;
+
+    slot.addEventListener('dragover',  e => { e.preventDefault(); slot.classList.add('drag-over'); });
+    slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
+    slot.addEventListener('drop', e => {
+      e.preventDefault();
+      slot.classList.remove('drag-over');
+      const korean = e.dataTransfer.getData('text/plain');
+      checkDrop(slot, korean, w);
+    });
+    slot.addEventListener('touchend', () => {
+      if (!draggedEl) return;
+      const korean = draggedEl.dataset.korean;
+      draggedEl.style.opacity = '1';
+      checkDrop(slot, korean, w);
+      draggedEl = null;
+    });
+
+    targetsZone.appendChild(slot);
+  });
+}
+
+function checkDrop(slot, droppedKorean, targetWord) {
+  if (slot.classList.contains('correct')) return;
+
+  if (droppedKorean === targetWord.korean) {
+    slot.classList.add('correct');
+    slot.innerHTML = `<div style="font-size:2rem">✅</div><div style="font-weight:bold;color:var(--green)">${targetWord.korean}</div><div style="font-size:0.8rem;color:#aaa">${targetWord.english}</div>`;
+    AudioManager.speakKorean(targetWord.korean);
+    showToast('Correct! 🎉 +10 pts', 'correct');
+    dragScore += 10;
+    document.getElementById('drag-score').textContent = dragScore;
+    const result = ProgressManager.addPoints(10);
+    if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+
+    document.querySelectorAll('.drag-item').forEach(it => {
+      if (it.dataset.korean === droppedKorean) it.remove();
+    });
+
+    const remaining = document.querySelectorAll('.drop-slot:not(.correct)').length;
+    if (remaining === 0) {
+      setTimeout(() => {
+        showToast('All matched! 🌟', 'star', 3000);
+        launchConfetti();
+        ProgressManager.addStar();
+      }, 500);
+    }
+  } else {
+    slot.classList.add('wrong');
+    showToast('Try again! 🙂', 'wrong');
+    setTimeout(() => slot.classList.remove('wrong'), 800);
+  }
+}
+
+// ── Star Quiz ─────────────────────────────────
+let sqIndex    = 0;
+let sqScore    = 0;
+let sqAnswered = false;
+
+function startStarQuiz() {
+  sqIndex    = 0;
+  sqScore    = 0;
+  sqAnswered = false;
+  document.getElementById('sq-q-num').textContent  = 1;
+  document.getElementById('sq-area').style.display = '';
+  document.getElementById('sq-done').style.display = 'none';
+  nextStarQuestion();
+}
+
+function nextStarQuestion() {
+  if (sqIndex >= 10) { finishStarQuiz(); return; }
+  sqAnswered = false;
+  document.getElementById('sq-q-num').textContent = sqIndex + 1;
+
+  const correct = gameWords[Math.floor(Math.random() * gameWords.length)];
+  const mode    = Math.random() < 0.5 ? 'picture' : 'english';
+
+  document.getElementById('sq-image').textContent = correct.emoji;
+  if (mode === 'picture') {
+    document.getElementById('sq-question').textContent = 'What is this in Korean?';
+  } else {
+    document.getElementById('sq-image').textContent    = correct.english;
+    document.getElementById('sq-question').textContent = 'How do you say this in Korean?';
+  }
+
+  AudioManager.speakEnglish(document.getElementById('sq-question').textContent);
+
+  const opts     = pickRandom(gameWords.filter(w => w.korean !== correct.korean), 3);
+  opts.push(correct);
+  const shuffled = shuffle(opts);
+
+  const container = document.getElementById('sq-options');
+  container.innerHTML = '';
+  shuffled.forEach(w => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.innerHTML = `<span style="font-size:1.5rem">${w.emoji}</span> ${w.korean}`;
+    btn.onclick = () => checkStarAnswer(btn, w, correct, container);
+    container.appendChild(btn);
+  });
+}
+
+function checkStarAnswer(btn, chosen, correct, container) {
+  if (sqAnswered) return;
+  sqAnswered = true;
+
+  if (chosen.korean === correct.korean) {
+    btn.classList.add('correct');
+    popElement(btn);
+    showToast('⭐ Correct! +10 pts', 'correct');
+    AudioManager.speakKorean(correct.korean);
+    sqScore++;
+    const result = ProgressManager.addPoints(10);
+    if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+  } else {
+    btn.classList.add('wrong');
+    shakeElement(btn);
+    showToast('Not quite! 🙂', 'wrong');
+    container.querySelectorAll('.quiz-option').forEach(b => {
+      if ((b.textContent || b.innerText).includes(correct.korean)) b.classList.add('correct');
+    });
+  }
+
+  sqIndex++;
+  setTimeout(nextStarQuestion, 1400);
+}
+
+function finishStarQuiz() {
+  document.getElementById('sq-area').style.display = 'none';
+  document.getElementById('sq-done').style.display = '';
+  document.getElementById('sq-final').textContent  = sqScore;
+  const starsCount = Math.round((sqScore / 10) * 3);
+  document.getElementById('sq-stars').textContent  = '⭐'.repeat(starsCount);
+  if (sqScore >= 7) { launchConfetti(); }
+  if (starsCount > 0) ProgressManager.addStar();
+}
+</script>
 </body>
 </html>
