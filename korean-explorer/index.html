@@ -684,7 +684,7 @@ function showHangulTab(tab, btn) {
 function showLetterGroup(group, btn) {
   currentGroup = group === 'consonants' ? consonants : vowels;
   currentIndex = 0;
-  document.querySelectorAll('#hangul-tab-learn .tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('hangul-tab-learn').querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderLetterGrid();
   renderLetterCard();
@@ -933,7 +933,8 @@ const wordData = {
 let modalWord = null;
 
 function initWordsScreen() {
-  showCategory('animals', document.querySelector('#screen-words .tabs .tab-btn'));
+  const firstBtn = document.querySelector('#screen-words .tabs .tab-btn');
+  if (firstBtn) showCategory('animals', firstBtn);
 }
 
 function showCategory(cat, btn) {
@@ -1093,7 +1094,7 @@ function newCountQuestion() {
   const opts      = generateNumOptions(num, 4);
   const container = document.getElementById('count-options');
   container.innerHTML = '';
-  container.dataset.answered = '';
+  delete container.dataset.answered;
   opts.forEach(o => {
     const btn = document.createElement('button');
     btn.className = 'quiz-option';
@@ -1113,14 +1114,14 @@ function checkCountAnswer(btn, chosen, correct, container) {
     AudioManager.speakKorean(correct.korean);
     const result = ProgressManager.addPoints(10);
     if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
-    setTimeout(() => { container.dataset.answered = ''; newCountQuestion(); }, 1200);
+    setTimeout(() => { delete container.dataset.answered; newCountQuestion(); }, 1200);
   } else {
     btn.classList.add('wrong');
     showToast('Not quite! Try again 🙂', 'wrong');
     AudioManager.speakEnglish('Try again');
     setTimeout(() => {
       btn.classList.remove('wrong');
-      container.dataset.answered = '';
+      delete container.dataset.answered;
     }, 1000);
   }
 }
