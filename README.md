@@ -35,18 +35,22 @@ explorer/
 │
 ├── math-explorer/
 │   ├── index.html
-│   ├── app.js              ← Main controller (state, UI, problem flow, rewards)
 │   ├── style.css
-│   └── modules/
-│       ├── problems.js     ← Problem generators for all 6 modes
-│       ├── rewards.js      ← Points, levels, streaks, badges
-│       ├── bignum.js       ← 100-digit big-integer utilities
-│       └── blocks3d.js     ← Isometric CSS/JS 3D block renderer
+│   └── js/
+│       ├── app.js          ← Main controller (state, UI, problem flow, rewards)
+│       ├── ad-config.js    ← Ad slot configuration
+│       └── modules/
+│           ├── problems.js     ← Problem generators for all 6 modes
+│           ├── rewards.js      ← Points, levels, streaks, badges
+│           ├── bignum.js       ← 100-digit big-integer utilities
+│           └── blocks3d.js     ← Isometric CSS/JS 3D block renderer
 │
 ├── english-explorer/
 │   ├── index.html
-│   ├── app.js              ← Full app logic (IIFE-encapsulated)
-│   └── style.css
+│   ├── style.css
+│   └── js/
+│       ├── app.js          ← Full app logic (IIFE-encapsulated)
+│       └── ad-config.js    ← Ad slot configuration
 │
 ├── clock-explorer/
 │   ├── index.html
@@ -54,27 +58,26 @@ explorer/
 │   └── js/
 │       ├── app.js          ← Main controller (modes, questions, progress)
 │       ├── clock.js        ← SVG analog clock component (draggable)
-│       └── utils.js        ← Time math, formatting, speech, sounds, confetti
+│       ├── utils.js        ← Time math, formatting, speech, sounds, confetti
+│       └── ad-config.js    ← Ad slot configuration
 │
 ├── maori-explorer/
 │   ├── index.html
-│   ├── script.js           ← Full app logic (routing, games, progress, audio)
-│   ├── data.js             ← Vocabulary data, module configs, badges
-│   ├── env.js              ← Ad-enable flag
-│   └── style.css
+│   ├── style.css
+│   └── js/
+│       ├── app.js          ← App logic (routing, games, progress, audio)
+│       ├── data.js         ← Vocabulary data, module configs, badges
+│       └── ad-config.js    ← Ad slot configuration
 │
 └── korean-explorer/
-    ├── index.html          ← Nav hub
-    ├── script.js           ← Shared utilities (toast, confetti, shuffle)
-    ├── audio.js            ← Speech synthesis wrapper (Korean + English)
-    ├── progress.js         ← Points, levels, stars (localStorage)
-    ├── ads.js              ← Ad integration helper
+    ├── index.html
     ├── style.css
-    ├── hangul.html         ← Hangul alphabet explorer
-    ├── numbers.html        ← Korean numbers 1–20
-    ├── words.html          ← Vocabulary cards (categories)
-    ├── phrases.html        ← Common phrases
-    └── games.html          ← Mini-games
+    └── js/
+        ├── app.js          ← Main app logic (routing, games, UI)
+        ├── audio.js        ← Speech synthesis wrapper (Korean + English)
+        ├── progress.js     ← Points, levels, stars (localStorage)
+        ├── ads.js          ← Ad integration helper
+        └── ad-config.js    ← Ad slot configuration
 ```
 
 ---

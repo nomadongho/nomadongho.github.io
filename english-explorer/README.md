@@ -1,55 +1,47 @@
-# english-explorer
+# 📖 English Explorer
 
-A static, client-side English learning app for young learners, hosted on GitHub Pages.
+A static, client-side English learning app for young learners, hosted on GitHub Pages. Built with plain HTML, CSS, and JavaScript — no frameworks, no build step.
 
 ---
 
-## Google Ads Integration
+## How to Run
 
-The app includes a **delayed ad banner** that appears on learning/play screens only. It never shows on the home screen or Parent Zone.
+1. Open `index.html` in any modern web browser.
+2. No server required — everything runs locally.
 
-### How it works
+---
 
-- A 60-second countdown starts when a learner enters a module screen (Letters, Trace, Phonics, Words, Game, Adventure).
-- The timer pauses if the browser tab is hidden and resumes when the tab becomes visible again.
-- Switching to a different module resets the timer.
-- After 60 seconds a subtle banner slides in above the bottom navigation bar.
-- While `ADS_ENABLED` is `false`, a quiet grey placeholder is shown instead of a real ad.
-
-### Where to find the config
-
-All ad settings live in one place:
+## File Structure
 
 ```
-js/ad-config.js
+english-explorer/
+├── index.html          ← App shell (all views and layout)
+├── style.css           ← All styles (mobile-first, responsive)
+├── js/
+│   ├── app.js          ← Full app logic (IIFE-encapsulated)
+│   └── ad-config.js    ← Ad slot configuration (see global README)
+└── README.md
 ```
 
-### How to enable real Google Ads
+---
 
-1. Open `js/ad-config.js`.
-2. Set `ADS_ENABLED` to `true`.
-3. Replace `ADSENSE_CLIENT_ID` with your publisher ID (format: `ca-pub-XXXXXXXXXXXXXXXX`).
-4. Replace `AD_SLOT_ID` with your ad slot number from Google AdSense.
-5. Set `AD_TEST_MODE` to `false` for production.
-6. (Optional) Adjust `AD_DELAY_MS` if you want a different delay.
+## Activity Screens
 
-```js
-const AD_CONFIG = {
-  ADS_ENABLED:       true,
-  ADSENSE_CLIENT_ID: 'ca-pub-YOUR_REAL_ID_HERE',
-  AD_SLOT_ID:        'YOUR_REAL_SLOT_ID',
-  AD_FORMAT:         'auto',
-  AD_LAYOUT_KEY:     '',
-  AD_TEST_MODE:      false,
-  AD_DELAY_MS:       60000,
-};
-```
+| Screen | Activity |
+|--------|----------|
+| Learn Letters | See upper/lower case, hear letter names and sounds |
+| Trace Letters | Draw on canvas, guide overlay, inactivity prompts |
+| Phonics | Hear letter sounds; blend CVC words step-by-step |
+| Read Words | CVC words → word families → sight words |
+| Listening Game | Find the Letter / Find the Sound / Match the Word |
+| Daily Adventure | Curated 9-step sequence refreshed each day |
 
-### Screens that intentionally do not show ads
+---
 
-| Screen | Reason |
-|--------|--------|
-| **Home** (`#screen-home`) | Landing / navigation hub — keeps the start experience clean |
-| **Parent Zone** (`#screen-parents`) | Admin/progress screen — no need for ad exposure |
+## Features
 
-All other screens (Letters, Trace, Phonics, Words, Game, Daily Adventure) show the delayed banner.
+- **Badge system**: Sound Scout, Letter Explorer, Word Walker, Reading Rocket
+- **Bedtime calm mode** and slow-speech mode
+- **Voice selection** via Web Speech API
+- **Parent Zone** with full progress stats and settings
+- Progress saved in `localStorage`

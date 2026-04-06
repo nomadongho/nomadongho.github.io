@@ -1,37 +1,48 @@
-# Clock-Educator
+# 🕐 Clock Explorer
 
-## Google Ads integration
+An interactive clock-reading web app for young learners, built with plain HTML, CSS, and JavaScript — no frameworks, no build step.
 
-### Where to put real Google Ads values
+---
 
-Open **`js/ad-config.js`** and update the three constants at the top:
+## How to Run
 
-```js
-ADS_ENABLED:       false,                 // ← change to true
-ADSENSE_CLIENT_ID: 'ca-pub-XXXXXXXXXXXXXXXX', // ← your publisher ID
-AD_SLOT_ID:        '1234567890',          // ← your ad slot ID
+1. Open `index.html` in any modern web browser.
+2. No server required — everything runs locally.
+
+---
+
+## File Structure
+
+```
+clock-explorer/
+├── index.html          ← App shell (all views and layout)
+├── style.css           ← All styles (mobile-first, responsive)
+├── js/
+│   ├── app.js          ← Main controller (modes, questions, progress)
+│   ├── clock.js        ← SVG analog clock component (draggable hands)
+│   ├── utils.js        ← Time math, formatting, speech, sounds, confetti
+│   └── ad-config.js    ← Ad slot configuration (see global README)
+└── README.md
 ```
 
-### How to enable ads
+---
 
-1. Replace `ADSENSE_CLIENT_ID` with your real AdSense publisher ID (e.g. `ca-pub-1234567890123456`).
-2. Replace `AD_SLOT_ID` with the slot ID for the ad unit you created in your AdSense dashboard.
-3. Set `ADS_ENABLED` to `true`.
-4. Optionally set `AD_TEST_MODE` to `true` while you are testing to avoid invalid-click penalties.
+## Learning Modes
 
-The AdSense library is loaded automatically when `ADS_ENABLED` is `true`.
-If the script is unavailable the app fails gracefully and shows nothing.
+| Mode | Description |
+|------|-------------|
+| Read the Clock | Look at the analog clock; choose the correct time |
+| Set the Clock | Drag the hands to match a given time |
+| Match Game | Match analog clocks with digital times |
+| Free Play | Explore the clock freely with live ticking |
 
-### Which screens intentionally do not show ads
+---
 
-| Screen | Shows ad? |
-|--------|-----------|
-| Home / mode-selection | ✗ Never |
-| Read the Clock | ✓ After 60 s |
-| Set the Clock | ✓ After 60 s |
-| Match Game | ✓ After 60 s |
-| Free Play | ✓ After 60 s |
+## Progression & Features
 
-The ad banner appears only after the learner has been in a module screen for
-60 continuous seconds (tab-hidden time is not counted).
-Switching to a different module resets the timer.
+- **Difficulty 1–5**: from o'clock only up to any minute
+- **Draggable SVG clock**: minute-snap and hour-hand coupling
+- **Milestone rewards** and streak tracking
+- **Category progress** saved in `localStorage`
+- Web Speech API for time read-aloud
+- Web Audio API for sound effects and confetti celebrations
