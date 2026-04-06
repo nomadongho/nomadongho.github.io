@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#FF6B6B">
+  <title>English Explorer 🗺️</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Bar (shown on all non-home screens) -->
+  <div id="top-bar" class="top-bar hidden">
+    <button class="top-home-btn" onclick="showScreen('home')" aria-label="Home">🏠</button>
+    <span id="screen-title-text" class="top-title">English Explorer</span>
+    <div class="top-stars">⭐ <span id="stars-count">0</span></div>
+  </div>
+
+  <!-- ===== SCREEN: HOME ===== -->
+  <div id="screen-home" class="screen active">
+    <div class="home-wrap">
+      <div class="home-hero">
+        <div class="hero-globe">🗺️</div>
+        <h1 class="hero-title">English Explorer</h1>
+        <p class="hero-greeting" id="greeting-text">Hello, Explorer! 👋</p>
+      </div>
+      <div class="home-grid">
+        <div class="home-card" onclick="navigateFromHome('letters','Learn Letters')" style="--c:#FF6B6B">
+          <span class="hc-emoji">🔤</span>
+          <div class="hc-title">Learn Letters</div>
+          <div class="hc-desc">A B C and more!</div>
+        </div>
+        <div class="home-card" onclick="navigateFromHome('trace','Trace Letters')" style="--c:#4ECDC4">
+          <span class="hc-emoji">✏️</span>
+          <div class="hc-title">Trace Letters</div>
+          <div class="hc-desc">Draw and practice!</div>
+        </div>
+        <div class="home-card" onclick="navigateFromHome('phonics','Phonics Sounds')" style="--c:#45B7D1">
+          <span class="hc-emoji">🎵</span>
+          <div class="hc-title">Phonics</div>
+          <div class="hc-desc">Letter sounds!</div>
+        </div>
+        <div class="home-card" onclick="navigateFromHome('words','Read Words')" style="--c:#96CEB4">
+          <span class="hc-emoji">📖</span>
+          <div class="hc-title">Read Words</div>
+          <div class="hc-desc">Read and learn!</div>
+        </div>
+        <div class="home-card" onclick="navigateFromHome('game','Listening Game')" style="--c:#FFD93D">
+          <span class="hc-emoji">🎮</span>
+          <div class="hc-title">Fun Game</div>
+          <div class="hc-desc">Play and win stars!</div>
+        </div>
+        <div class="home-card" onclick="navigateFromHome('adventure','Daily Adventure')" style="--c:#DDA0DD">
+          <span class="hc-emoji">🌟</span>
+          <div class="hc-title">Daily Adventure</div>
+          <div class="hc-desc">Today's journey!</div>
+        </div>
+      </div>
+      <div class="home-footer">
+        <button id="home-parent-btn" class="parent-hold-btn"
+          onmousedown="startParentHold()" onmouseup="cancelParentHold()" onmouseleave="cancelParentHold()"
+          ontouchstart="startParentHold(event)" ontouchend="cancelParentHold()">
+          <span>👨‍👩‍👧 Parent Zone — Hold 2s</span>
+          <div class="hold-bar-wrap"><div id="hold-bar-home" class="hold-bar-fill"></div></div>
+        </button>
+        <button class="fullscreen-btn" onclick="toggleFullscreen()" title="Full Screen">⛶ Full Screen</button>
+      </div>
+      <footer class="dev-contact">
+        <span>Contact the developer:</span>
+        <a href="mailto:nomadongho@gmail.com?subject=%5BEnglish%20Explorer%5D%20Suggestion&body=Hi%2C%0A%0AI%20have%20an%20idea%20for%20English%20Explorer%3A%0A%0A...%0A" aria-label="Send email to suggest an idea for English Explorer">Suggest an idea</a>
+        <span aria-hidden="true">·</span>
+        <a href="mailto:nomadongho@gmail.com?subject=%5BEnglish%20Explorer%5D%20Bug%20Report&body=Hi%2C%0A%0AI%20found%20a%20problem%20in%20English%20Explorer.%0A%0AWhat%20happened%3A%0A...%0A%0ADevice%2Fbrowser%3A%0A...%0A" aria-label="Send email to report a problem in English Explorer">Report a problem</a>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: LEARN LETTERS ===== -->
+  <div id="screen-letters" class="screen">
+    <div class="screen-scroll">
+      <div class="letter-meta-row">
+        <span class="counter-pill"><span id="letter-num">1</span> / 26</span>
+        <span class="learned-pill" id="letters-learned-pill">0 learned ⭐</span>
+      </div>
+      <div class="letter-big-card">
+        <div class="letter-upper-display" id="letter-upper">A</div>
+        <div class="letter-lower-display" id="letter-lower">a</div>
+      </div>
+      <div class="example-row">
+        <div class="example-tile" id="ex-tile-1" onclick="onHearWord()">
+          <div class="ex-emoji" id="ex1-emoji">🍎</div>
+          <div class="ex-word" id="ex1-word">Apple</div>
+        </div>
+        <div class="example-tile" id="ex-tile-2" onclick="onHearWord2()">
+          <div class="ex-emoji" id="ex2-emoji">🐜</div>
+          <div class="ex-word" id="ex2-word">Ant</div>
+        </div>
+      </div>
+      <div class="audio-btn-row">
+        <button class="audio-btn red" onclick="onHearLetter()">🔊 Letter</button>
+        <button class="audio-btn teal" onclick="onHearSound()">🎵 Sound</button>
+        <button class="audio-btn blue" onclick="onHearWord()">📢 Word</button>
+      </div>
+      <div class="nav-btn-row">
+        <button class="arrow-btn" onclick="prevLetter()">◀ Prev</button>
+        <button class="autoplay-btn" id="autoplay-btn" onclick="toggleAutoPlay()">▶ Auto Play</button>
+        <button class="arrow-btn" onclick="nextLetter()">Next ▶</button>
+      </div>
+      <div class="progress-dots" id="letter-progress-dots"></div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: TRACE LETTERS ===== -->
+  <div id="screen-trace" class="screen">
+    <div class="screen-scroll">
+      <div class="trace-top-row">
+        <div class="trace-target-letter" id="trace-letter-display">A</div>
+        <div class="trace-msg" id="trace-msg">✏️ Trace the letter!</div>
+      </div>
+      <div class="canvas-container">
+        <canvas id="guide-canvas" width="300" height="300"></canvas>
+        <canvas id="draw-canvas" width="300" height="300"></canvas>
+      </div>
+      <div class="trace-ctrl-row">
+        <button class="trace-btn" onclick="clearDrawCanvas()">🗑️ Clear</button>
+        <button class="trace-btn" id="guide-toggle-btn" onclick="toggleGuide()">👁️ Guide: ON</button>
+        <button class="trace-btn" onclick="speakCurrentTraceLetter()">🔊 Hear</button>
+        <button class="trace-btn" onclick="nextTraceLetter()">▶ Next</button>
+      </div>
+      <div class="trace-picker" id="trace-picker"></div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: PHONICS SOUNDS ===== -->
+  <div id="screen-phonics" class="screen">
+    <div class="screen-scroll">
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tab-btn-sounds" onclick="showPhonicsTab('sounds')">🔡 Letter Sounds</button>
+        <button class="tab-btn" id="tab-btn-blend" onclick="showPhonicsTab('blend')">🔀 Word Blending</button>
+      </div>
+
+      <!-- Tab: Letter Sounds -->
+      <div id="phonics-tab-sounds" class="tab-panel active">
+        <div class="phonics-stage-label">⭐ Stage 1 — Vowels</div>
+        <div class="phonics-grid phonics-vowels-grid" id="phonics-vowels-grid"></div>
+        <div class="phonics-stage-label">🔡 Stage 1 — Consonants</div>
+        <div class="phonics-grid" id="phonics-cons-grid"></div>
+        <p class="tab-hint">Tap any letter to hear its sound! 👆</p>
+      </div>
+
+      <!-- Tab: Word Blending -->
+      <div id="phonics-tab-blend" class="tab-panel">
+        <div class="blend-word-nav">
+          <button class="arrow-btn" onclick="prevPhonicsWord()">◀</button>
+          <span class="counter-pill"><span id="blend-num">1</span> / <span id="blend-total">20</span></span>
+          <button class="arrow-btn" onclick="nextPhonicsWord()">▶</button>
+        </div>
+        <div class="blend-big-emoji" id="blend-emoji">🐱</div>
+        <div class="blend-parts-row" id="blend-parts-row"></div>
+        <div class="blend-action-row">
+          <button class="blend-big-btn" onclick="blendWord()">🔀 Blend!</button>
+          <button class="blend-big-btn secondary" onclick="blendWordSlow()">🐢 Slow Blend</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: READ WORDS ===== -->
+  <div id="screen-words" class="screen">
+    <div class="screen-scroll">
+      <div class="level-btn-row">
+        <button class="level-btn active" id="lvl-btn-1" onclick="setWordLevel(1)">Level 1<br><small>CVC Words</small></button>
+        <button class="level-btn" id="lvl-btn-2" onclick="setWordLevel(2)">Level 2<br><small>Word Families</small></button>
+        <button class="level-btn" id="lvl-btn-3" onclick="setWordLevel(3)">Level 3<br><small>Sight Words</small></button>
+      </div>
+      <div class="read-word-card">
+        <div class="rw-emoji" id="rw-emoji">🐱</div>
+        <div class="rw-letters" id="rw-letters"></div>
+        <div class="rw-family-tag" id="rw-family-tag"></div>
+        <div class="rw-sentence" id="rw-sentence"></div>
+      </div>
+      <div class="word-ctrl-row">
+        <button class="word-ctrl-btn" onclick="hearCurrentWord()">🔊 Hear</button>
+        <button class="word-ctrl-btn primary" onclick="readWithMe()">👂 Read With Me</button>
+      </div>
+      <div class="word-nav-row">
+        <button class="arrow-btn" onclick="prevWord()">◀ Prev</button>
+        <span class="counter-pill" id="word-counter">1 / 15</span>
+        <button class="arrow-btn" onclick="nextWord()">Next ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: LISTENING GAME ===== -->
+  <div id="screen-game" class="screen">
+    <div class="screen-scroll">
+
+      <!-- Game Selector -->
+      <div id="game-selector" class="game-selector">
+        <h2 class="section-heading">Pick a Game! 🎮</h2>
+        <div class="game-select-grid">
+          <div class="game-select-tile" onclick="startGame('findLetter')">
+            <div class="gst-emoji">🔤</div>
+            <div class="gst-title">Find the Letter</div>
+            <div class="gst-desc">Hear a letter, tap it!</div>
+          </div>
+          <div class="game-select-tile" onclick="startGame('findSound')">
+            <div class="gst-emoji">🎵</div>
+            <div class="gst-title">Find the Sound</div>
+            <div class="gst-desc">Hear a sound, tap it!</div>
+          </div>
+          <div class="game-select-tile" onclick="startGame('matchWord')">
+            <div class="gst-emoji">📖</div>
+            <div class="gst-title">Match the Word</div>
+            <div class="gst-desc">Hear a word, match it!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Game -->
+      <div id="game-active" class="game-active hidden">
+        <div class="game-status-bar">
+          <button class="quit-game-btn" onclick="quitGame()">✖ Quit</button>
+          <span class="game-score-chip">⭐ <span id="game-score">0</span></span>
+          <div class="lives-row">
+            <span class="life" id="life-0">❤️</span>
+            <span class="life" id="life-1">❤️</span>
+            <span class="life" id="life-2">❤️</span>
+          </div>
+        </div>
+        <div class="question-box">
+          <p class="question-text" id="game-question">Listen carefully! 👂</p>
+          <button class="hear-again-btn" onclick="playGameQuestion()">🔊 Hear Again</button>
+        </div>
+        <div class="answer-options" id="answer-options"></div>
+        <div class="game-feedback" id="game-feedback"></div>
+      </div>
+
+      <!-- Game Over -->
+      <div id="game-over" class="game-over hidden">
+        <div class="go-trophy">🏆</div>
+        <h2 class="go-title">Well Done!</h2>
+        <p class="go-stars">You earned <strong><span id="final-score">0</span> stars</strong> ⭐</p>
+        <div class="go-btns">
+          <button class="go-btn" onclick="showGameSelector()">🔄 Play Again</button>
+          <button class="go-btn secondary" onclick="showScreen('home')">🏠 Home</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: DAILY ADVENTURE ===== -->
+  <div id="screen-adventure" class="screen">
+    <div class="screen-scroll">
+      <h2 class="section-heading">🌟 Today's Adventure</h2>
+      <p class="adventure-date" id="adventure-date"></p>
+      <div class="adventure-steps" id="adventure-steps"></div>
+      <div id="adventure-complete" class="adventure-complete hidden">
+        <div class="ac-emoji">🎉</div>
+        <h2>Adventure Complete!</h2>
+        <p>You're amazing! Come back tomorrow for a new adventure!</p>
+        <button class="go-btn" onclick="showScreen('home')">🏠 Go Home</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: PARENT ZONE ===== -->
+  <div id="screen-parents" class="screen">
+    <div class="screen-scroll">
+      <div class="parent-header">
+        <h2 class="parent-zone-title">👨‍👩‍👧 Parent Zone</h2>
+        <button class="close-btn" onclick="showScreen('home')">✖ Close</button>
+      </div>
+
+      <div class="parent-card">
+        <h3>📊 Progress</h3>
+        <div class="stat-row"><span class="stat-label">Letters Viewed</span><span class="stat-val" id="stat-letters">0 / 26</span></div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="sb-letters" style="width:0%"></div></div>
+        <div class="stat-row"><span class="stat-label">Letters Traced</span><span class="stat-val" id="stat-letters-traced">0</span></div>
+        <div class="stat-row"><span class="stat-label">Words Completed</span><span class="stat-val" id="stat-words">0</span></div>
+        <div class="stat-bar"><div class="stat-bar-fill" id="sb-words" style="width:0%"></div></div>
+        <div class="stat-row"><span class="stat-label">Words Read</span><span class="stat-val" id="stat-words-read">0</span></div>
+        <div class="stat-row"><span class="stat-label">Games Played</span><span class="stat-val" id="stat-games">0</span></div>
+        <div class="stat-row"><span class="stat-label">Games Won</span><span class="stat-val" id="stat-games-won">0</span></div>
+        <div class="stat-row"><span class="stat-label">Total Stars ⭐</span><span class="stat-val" id="stat-stars">0</span></div>
+      </div>
+
+      <div class="parent-card">
+        <h3>🏆 Badges Earned</h3>
+        <div class="badges-row">
+          <div class="badge-tile" id="badge-tile-1">
+            <div class="badge-icon" id="badge-icon-1">🔒</div>
+            <div class="badge-name">Sound Scout</div>
+            <div class="badge-req">10 correct answers</div>
+          </div>
+          <div class="badge-tile" id="badge-tile-2">
+            <div class="badge-icon" id="badge-icon-2">🔒</div>
+            <div class="badge-name">Letter Explorer</div>
+            <div class="badge-req">5 letters traced</div>
+          </div>
+          <div class="badge-tile" id="badge-tile-3">
+            <div class="badge-icon" id="badge-icon-3">🔒</div>
+            <div class="badge-name">Word Walker</div>
+            <div class="badge-req">10 words read</div>
+          </div>
+          <div class="badge-tile" id="badge-tile-4">
+            <div class="badge-icon" id="badge-icon-4">🔒</div>
+            <div class="badge-name">Reading Rocket</div>
+            <div class="badge-req">Finish daily adventure</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="parent-card">
+        <h3>⚙️ Settings</h3>
+        <div class="setting-row">
+          <span class="setting-label">Auto-Read on Enter</span>
+          <label class="toggle">
+            <input type="checkbox" id="setting-autoread" checked onchange="updateSetting('autoRead', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Speech Speed</span>
+          <select id="setting-speed" class="setting-select" onchange="updateSetting('speechSpeed', this.value)">
+            <option value="normal">Normal</option>
+            <option value="slow">Slow</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Voice</span>
+          <select id="setting-voice" class="setting-select" onchange="updateSetting('voiceURI', this.value)">
+            <option value="">Default voice</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Learning Mode</span>
+          <select id="setting-mode" class="setting-select" onchange="updateSetting('learningMode', this.value)">
+            <option value="alphabet">Alphabet Focus</option>
+            <option value="phonics">Phonics Focus</option>
+            <option value="mixed" selected>Mixed</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Uppercase Letters First</span>
+          <label class="toggle">
+            <input type="checkbox" id="setting-uppercase" checked onchange="updateSetting('uppercaseFirst', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">Phonics-First Mode</span>
+          <label class="toggle">
+            <input type="checkbox" id="setting-phonics" onchange="updateSetting('phonicsFirst', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div class="setting-row">
+          <span class="setting-label">🌙 Bedtime Calm Mode</span>
+          <label class="toggle">
+            <input type="checkbox" id="setting-bedtime" onchange="updateSetting('bedtimeMode', this.checked)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="parent-card danger">
+        <button class="reset-btn" onclick="confirmReset()">🗑️ Reset All Progress</button>
+        <button class="reset-btn secondary" onclick="resetDailyAdventure()">🔄 Reset Daily Adventure</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOTTOM NAVIGATION ===== -->
+  <nav id="bottom-nav" class="bottom-nav hidden">
+    <button class="nav-item" data-screen="home" onclick="showScreen('home')">
+      <span class="ni-icon">🏠</span><span class="ni-label">Home</span>
+    </button>
+    <button class="nav-item" data-screen="letters" onclick="showScreen('letters')">
+      <span class="ni-icon">🔤</span><span class="ni-label">Letters</span>
+    </button>
+    <button class="nav-item" data-screen="trace" onclick="showScreen('trace')">
+      <span class="ni-icon">✏️</span><span class="ni-label">Trace</span>
+    </button>
+    <button class="nav-item" data-screen="phonics" onclick="showScreen('phonics')">
+      <span class="ni-icon">🎵</span><span class="ni-label">Sounds</span>
+    </button>
+    <button class="nav-item" data-screen="words" onclick="showScreen('words')">
+      <span class="ni-icon">📖</span><span class="ni-label">Words</span>
+    </button>
+    <button class="nav-item" data-screen="game" onclick="showScreen('game')">
+      <span class="ni-icon">🎮</span><span class="ni-label">Game</span>
+    </button>
+    <button class="nav-item parent-nav" id="nav-parents-btn"
+      onmousedown="startParentHold()" onmouseup="cancelParentHold()" onmouseleave="cancelParentHold()"
+      ontouchstart="startParentHold(event)" ontouchend="cancelParentHold()">
+      <span class="ni-icon">👪</span><span class="ni-label">Parents</span>
+      <div class="nav-hold-wrap"><div id="nav-hold-fill" class="nav-hold-fill"></div></div>
+    </button>
+  </nav>
+
+  <!-- ===== OVERLAYS ===== -->
+  <div id="star-pop" class="star-pop hidden">⭐ +1</div>
+  <div id="badge-popup" class="badge-popup hidden"></div>
+  <div id="confetti-container" class="confetti-container"></div>
+
+  <!-- Ad config and manager must load before app.js -->
+  <script src="js/ad-config.js"></script>
+  <script src="../shared/ad-manager.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

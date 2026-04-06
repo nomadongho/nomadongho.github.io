@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Korean Explorer 🇰🇷</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <span class="logo-icon">🇰🇷</span>
+    <span class="logo-text">Korean Explorer</span>
+  </a>
+  <nav>
+    <a href="hangul.html">🔤 Hangul</a>
+    <a href="words.html">🐱 Words</a>
+    <a href="numbers.html">🔢 Numbers</a>
+    <a href="phrases.html">💬 Phrases</a>
+    <a href="games.html">🎮 Games</a>
+  </nav>
+</header>
+
+<main>
+  <!-- Progress widget -->
+  <div class="progress-widget">
+    <div class="level-badge" id="level-display">Level 1</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-bar-fill" style="width:0%"></div>
+    </div>
+    <div class="points-display" id="points-display">⭐ 0 pts</div>
+    <div class="stars-display" id="stars-display"></div>
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-emoji">🇰🇷</div>
+    <h1>Korean Explorer!</h1>
+    <p>Let's learn Korean together! Choose a lesson below 👇</p>
+    <button class="btn btn-primary btn-lg" onclick="AudioManager.speakEnglish('Welcome to Korean Explorer! Let\\'s learn Korean together!')">
+      🔊 Welcome!
+    </button>
+  </div>
+
+  <!-- Module grid -->
+  <div class="module-grid">
+    <a href="hangul.html" class="module-card hangul">
+      <div class="card-emoji">🔤</div>
+      <h2>Hangul Explorer</h2>
+      <p>Learn Korean letters A-B-C!</p>
+    </a>
+    <a href="words.html" class="module-card words">
+      <div class="card-emoji">🐱</div>
+      <h2>Word Explorer</h2>
+      <p>Animals, Food, Colors &amp; more!</p>
+    </a>
+    <a href="numbers.html" class="module-card numbers">
+      <div class="card-emoji">🔢</div>
+      <h2>Number Explorer</h2>
+      <p>Count 1 to 20 in Korean!</p>
+    </a>
+    <a href="phrases.html" class="module-card phrases">
+      <div class="card-emoji">💬</div>
+      <h2>Phrase Explorer</h2>
+      <p>Say Hello, Thank you &amp; more!</p>
+    </a>
+    <a href="games.html" class="module-card games">
+      <div class="card-emoji">🎮</div>
+      <h2>Mini Games</h2>
+      <p>Play fun matching games!</p>
+    </a>
+  </div>
+</main>
+
+<footer>
+  <p>Made with ❤️ for little learners!</p>
+  <p><a href="mailto:nomadongho@gmail.com?subject=Korean Explorer Feedback">✉️ Send feedback to developer</a></p>
+</footer>
+
+<div id="toast"></div>
+
+<script src="audio.js"></script>
+<script src="progress.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
