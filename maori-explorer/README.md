@@ -94,36 +94,16 @@ To add a new vocabulary item, simply add a new object to the relevant array in `
 
 ---
 
-## 📢 Google Ad Slot Integration (Future)
-
-Banner ad placeholders are included on module and game pages. They are **hidden by default** and appear 60 seconds after the user enters a page.
-
-To integrate real Google AdSense ads:
-
-1. In `index.html`, find the `<div class="ad-placeholder">` elements (one per module/game view).
-2. Replace the placeholder content with your AdSense snippet:
-   ```html
-   <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="ca-pub-XXXXXXXX"
-        data-ad-slot="XXXXXXXXXX"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-   <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-   ```
-3. Add the AdSense `<script>` tag to the `<head>` of `index.html`.
-4. The 60-second delay logic is in `script.js` → `startAdTimer()` function.
-
----
-
 ## 📁 File Structure
 
 ```
 maori-explorer/
 ├── index.html          # Main HTML shell (all views, header, footer)
 ├── style.css           # All styles (mobile-first, child-friendly)
-├── script.js           # App logic: routing, audio, games, rewards
-├── data.js             # All vocabulary content and module config
+├── js/
+│   ├── app.js          # App logic: routing, audio, games, rewards
+│   ├── data.js         # All vocabulary content and module config
+│   └── ad-config.js    # Ad slot configuration (see global README)
 ├── assets/
 │   ├── audio/
 │   │   └── README.md   # Instructions for adding recorded audio files
