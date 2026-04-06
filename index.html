@@ -1,901 +1,228 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Nomadongho — 능동적이고 진취적인 프로젝트 매니저. 디지털 세상을 누비며 혁신적인 프로젝트를 이끕니다." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="A collection of interactive learning apps made with love for Leo Park — explore math, English, and time together." />
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6962989029779783"
      crossorigin="anonymous"></script>
-  <title>Nomadongho | Project Manager</title>
+  <title>Leo's Explorer — Learning Apps for Leo Park</title>
+  <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Noto+Sans+KR:wght@300;400;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #0a0a0f;
-      --surface: #12121a;
-      --border: #1e1e2e;
-      --accent: #7c3aed;
-      --accent2: #06b6d4;
-      --accent3: #f59e0b;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --card: #16162a;
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', 'Noto Sans KR', sans-serif;
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-
-    /* ── Noise overlay ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    /* ── Nav ── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: rgba(10, 10, 15, 0.8);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-logo {
-      font-weight: 800;
-      font-size: 1.1rem;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: -0.02em;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--text); }
-
-    /* ── Hero ── */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 8rem 2rem 4rem;
-      position: relative;
-    }
-
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      z-index: 0;
-    }
-
-    .orb {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      animation: float 8s ease-in-out infinite;
-    }
-
-    .orb-1 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%);
-      top: -100px; left: -100px;
-      animation-delay: 0s;
-    }
-
-    .orb-2 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%);
-      bottom: -50px; right: -50px;
-      animation-delay: 3s;
-    }
-
-    .orb-3 {
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(245,158,11,0.15) 0%, transparent 70%);
-      top: 40%; left: 60%;
-      animation-delay: 6s;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-30px) scale(1.05); }
-    }
-
-    .hero-content { position: relative; z-index: 1; max-width: 800px; }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(124,58,237,0.15);
-      border: 1px solid rgba(124,58,237,0.4);
-      color: #a78bfa;
-      padding: 0.4rem 1rem;
-      border-radius: 100px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-bottom: 1.5rem;
-    }
-
-    .badge-dot {
-      width: 6px; height: 6px;
-      background: #a78bfa;
-      border-radius: 50%;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
-    }
-
-    .hero h1 {
-      font-size: clamp(2.5rem, 7vw, 5rem);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.1;
-      margin-bottom: 1.5rem;
-    }
-
-    .gradient-text {
-      background: linear-gradient(135deg, #a78bfa 0%, #06b6d4 50%, #f59e0b 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      background-size: 200% 200%;
-      animation: gradientShift 4s ease infinite;
-    }
-
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    .hero-description {
-      font-size: 1.15rem;
-      color: var(--muted);
-      max-width: 600px;
-      margin: 0 auto 2.5rem;
-      line-height: 1.8;
-    }
-
-    .hero-cta {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      padding: 0.75rem 1.75rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s ease;
-      cursor: pointer;
-      border: none;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #5b21b6);
-      color: #fff;
-      box-shadow: 0 4px 24px rgba(124,58,237,0.4);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(124,58,237,0.5);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-
-    .btn-outline:hover {
-      border-color: var(--accent);
-      color: #a78bfa;
-      transform: translateY(-2px);
-    }
-
-    /* ── Typewriter ── */
-    .typewriter {
-      display: inline-block;
-      border-right: 2px solid var(--accent2);
-      padding-right: 2px;
-      animation: blink 0.8s step-end infinite;
-    }
-
-    @keyframes blink { 50% { border-color: transparent; } }
-
-    /* ── Stats strip ── */
-    .stats {
-      padding: 3rem 2rem;
-      display: flex;
-      justify-content: center;
-      gap: 4rem;
-      flex-wrap: wrap;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
-    }
-
-    .stat-item { text-align: center; }
-
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      display: block;
-      line-height: 1;
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 0.85rem;
-      margin-top: 0.4rem;
-    }
-
-    /* ── Sections ── */
-    section { padding: 6rem 2rem; }
-
-    .container {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .section-eyebrow {
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #a78bfa;
-      margin-bottom: 0.75rem;
-    }
-
-    .section-title {
-      font-size: clamp(1.8rem, 4vw, 2.8rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: 1rem;
-    }
-
-    .section-subtitle {
-      color: var(--muted);
-      font-size: 1.05rem;
-      max-width: 560px;
-    }
-
-    /* ── Projects ── */
-    #projects { background: var(--surface); }
-
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
-
-    .project-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.75rem;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-      cursor: pointer;
-    }
-
-    .project-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(124,58,237,0.05), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .project-card:hover::before { opacity: 1; }
-
-    .project-card:hover {
-      border-color: rgba(124,58,237,0.5);
-      transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(124,58,237,0.2);
-    }
-
-    .project-icon {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-      display: block;
-    }
-
-    .project-tag {
-      display: inline-block;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 0.2rem 0.65rem;
-      border-radius: 100px;
-      margin-bottom: 0.75rem;
-    }
-
-    .tag-active { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-    .tag-building { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-    .tag-research { background: rgba(6,182,212,0.15); color: #22d3ee; border: 1px solid rgba(6,182,212,0.3); }
-
-    .project-card h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-
-    .project-card p {
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.7;
-      margin-bottom: 1.25rem;
-    }
-
-    .project-stack {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-
-    .stack-item {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.75rem;
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
-    }
-
-    /* ── Approach ── */
-    .approach-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1.5rem;
-      margin-top: 3rem;
-    }
-
-    .approach-item {
-      padding: 1.5rem;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--surface);
-      transition: border-color 0.2s;
-    }
-
-    .approach-item:hover { border-color: rgba(124,58,237,0.4); }
-
-    .approach-number {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1;
-      margin-bottom: 0.75rem;
-    }
-
-    .approach-item h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
-    .approach-item p { color: var(--muted); font-size: 0.88rem; line-height: 1.7; }
-
-    /* ── Terminal widget ── */
-    .terminal-section {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .terminal {
-      background: #0d0d14;
-      border: 1px solid #2d2d3d;
-      border-radius: 12px;
-      overflow: hidden;
-      max-width: 680px;
-      margin: 3rem auto 0;
-      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-    }
-
-    .terminal-header {
-      background: #1a1a2e;
-      padding: 0.75rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .dot { width: 12px; height: 12px; border-radius: 50%; }
-    .dot-red { background: #ff5f57; }
-    .dot-yellow { background: #febc2e; }
-    .dot-green { background: #28c840; }
-
-    .terminal-title {
-      color: var(--muted);
-      font-size: 0.8rem;
-      margin-left: auto;
-      font-family: monospace;
-    }
-
-    .terminal-body {
-      padding: 1.5rem;
-      font-family: 'Courier New', monospace;
-      font-size: 0.88rem;
-      line-height: 1.8;
-    }
-
-    .t-prompt { color: #a78bfa; }
-    .t-cmd { color: #e2e8f0; }
-    .t-comment { color: #475569; }
-    .t-green { color: #34d399; }
-    .t-cyan { color: #22d3ee; }
-    .t-yellow { color: #fbbf24; }
-    .t-line { display: block; }
-
-    /* ── Contact ── */
-    .contact-wrapper {
-      text-align: center;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .contact-links {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin-top: 2rem;
-      flex-wrap: wrap;
-    }
-
-    .contact-link {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.65rem 1.25rem;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-    }
-
-    .contact-link:hover {
-      border-color: var(--accent);
-      color: #a78bfa;
-      transform: translateY(-2px);
-    }
-
-    /* ── Footer ── */
-    footer {
-      text-align: center;
-      padding: 2rem;
-      color: var(--muted);
-      font-size: 0.85rem;
-      border-top: 1px solid var(--border);
-    }
-
-    footer a { color: var(--muted); text-decoration: none; }
-    footer a:hover { color: var(--text); }
-
-    /* ── Scroll indicator ── */
-    .scroll-indicator {
-      position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.4rem;
-      color: var(--muted);
-      font-size: 0.75rem;
-      animation: fadeInUp 1s ease 1.5s both;
-    }
-
-    .scroll-arrow {
-      width: 20px; height: 20px;
-      border-right: 2px solid var(--muted);
-      border-bottom: 2px solid var(--muted);
-      transform: rotate(45deg);
-      animation: scrollBounce 1.5s ease-in-out infinite;
-    }
-
-    @keyframes scrollBounce {
-      0%, 100% { transform: rotate(45deg) translateY(0); }
-      50% { transform: rotate(45deg) translateY(6px); }
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
-      to { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
-
-    /* ── Animations ── */
-    .fade-in {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 640px) {
-      nav { padding: 1rem; }
-      .nav-links { display: none; }
-      .stats { gap: 2rem; }
-      section { padding: 4rem 1.25rem; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-  <!-- Navigation -->
-  <nav>
-    <span class="nav-logo">Nomadongho</span>
-    <ul class="nav-links">
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#approach">Approach</a></li>
-      <li><a href="#terminal">Now</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </nav>
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-bg">
-      <div class="orb orb-1"></div>
-      <div class="orb orb-2"></div>
-      <div class="orb orb-3"></div>
+  <!-- ===== HERO ===== -->
+  <header class="hero" role="banner">
+    <div class="hero__stars" aria-hidden="true">
+      <span class="star star--1">✦</span>
+      <span class="star star--2">✦</span>
+      <span class="star star--3">✧</span>
+      <span class="star star--4">✦</span>
+      <span class="star star--5">✧</span>
+      <span class="star star--6">✦</span>
     </div>
-    <div class="hero-content">
-      <div class="hero-badge">
-        <span class="badge-dot"></span>
-        현재 프로젝트 진행 중
-      </div>
-      <h1>
-        안녕하세요,<br />
-        저는 <span class="gradient-text">Nomadongho</span><br />
-        입니다
-      </h1>
-      <p class="hero-description">
-        <span class="typewriter" id="typewriter">디지털 세상을 누비는 프로젝트 매니저</span><br />
-        능동적으로 문제를 찾고, 진취적으로 팀을 이끌며,<br />
-        인터렉티브한 경험을 통해 세상을 바꿔나갑니다.
+    <div class="container hero__inner">
+      <div class="hero__badge">Made for Leo Park ✨</div>
+      <h1 class="hero__title">A Little World Built<br />Just for You, Leo</h1>
+      <p class="hero__subtitle">
+        Five small apps, made with a lot of love — to help you learn
+        through play, follow your curiosity, and grow one discovery at a time.
       </p>
-      <div class="hero-cta">
-        <a href="#projects" class="btn btn-primary">진행 중인 프로젝트 보기</a>
-        <a href="#contact" class="btn btn-outline">연락하기</a>
-      </div>
+      <a href="#apps" class="btn btn--hero">Explore the Apps</a>
     </div>
-    <div class="scroll-indicator">
-      <span>scroll</span>
-      <div class="scroll-arrow"></div>
+    <div class="hero__wave" aria-hidden="true">
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#faf8f4"/>
+      </svg>
     </div>
-  </div>
+  </header>
 
-  <!-- Stats -->
-  <div class="stats">
-    <div class="stat-item fade-in">
-      <span class="stat-number" data-target="12">0</span>
-      <span class="stat-label">완료 프로젝트</span>
-    </div>
-    <div class="stat-item fade-in">
-      <span class="stat-number" data-target="5">0</span>
-      <span class="stat-label">진행 중인 프로젝트</span>
-    </div>
-    <div class="stat-item fade-in">
-      <span class="stat-number" data-target="30">0</span>
-      <span class="stat-label">협업한 팀원</span>
-    </div>
-    <div class="stat-item fade-in">
-      <span class="stat-number" data-target="3">0</span>
-      <span class="stat-label">거주한 나라</span>
-    </div>
-  </div>
-
-  <!-- Projects -->
-  <section id="projects">
-    <div class="container">
-      <p class="section-eyebrow fade-in">Active Projects</p>
-      <h2 class="section-title fade-in">지금 이 순간도<br />움직이고 있습니다</h2>
-      <p class="section-subtitle fade-in">아이디어가 현실이 되는 과정을 직접 설계하고, 팀과 함께 끊임없이 실행합니다.</p>
-
-      <div class="projects-grid">
-
-        <div class="project-card fade-in">
-          <span class="project-icon">🌐</span>
-          <span class="project-tag tag-active">Active</span>
-          <h3>Nomad Hub</h3>
-          <p>전 세계 디지털 노마드를 위한 커뮤니티 플랫폼. 실시간 워크스페이스 공유, 협업 매칭, 로컬 인사이트를 하나로.</p>
-          <div class="project-stack">
-            <span class="stack-item">React</span>
-            <span class="stack-item">Node.js</span>
-            <span class="stack-item">WebSocket</span>
-            <span class="stack-item">MongoDB</span>
-          </div>
-        </div>
-
-        <div class="project-card fade-in">
-          <span class="project-icon">🤖</span>
-          <span class="project-tag tag-active">Active</span>
-          <h3>PM Assistant AI</h3>
-          <p>프로젝트 매니저의 일상을 자동화하는 AI 어시스턴트. 회의록 요약부터 스프린트 계획까지, 똑똑하게 도와줍니다.</p>
-          <div class="project-stack">
-            <span class="stack-item">Python</span>
-            <span class="stack-item">LangChain</span>
-            <span class="stack-item">OpenAI</span>
-            <span class="stack-item">FastAPI</span>
-          </div>
-        </div>
-
-        <div class="project-card fade-in">
-          <span class="project-icon">📍</span>
-          <span class="project-tag tag-building">Building</span>
-          <h3>Roamboard</h3>
-          <p>노마드 라이프를 위한 인터렉티브 지도 기반 여정 트래커. 방문한 도시, 진행한 프로젝트, 만난 사람들을 기록합니다.</p>
-          <div class="project-stack">
-            <span class="stack-item">Next.js</span>
-            <span class="stack-item">Mapbox</span>
-            <span class="stack-item">Supabase</span>
-          </div>
-        </div>
-
-        <div class="project-card fade-in">
-          <span class="project-icon">🎯</span>
-          <span class="project-tag tag-building">Building</span>
-          <h3>Sprint Zero</h3>
-          <p>스타트업 초기 단계를 위한 린 PM 툴킷. 빠른 가설 검증과 MVP 설계를 위한 인터렉티브 워크플로우 보드.</p>
-          <div class="project-stack">
-            <span class="stack-item">Vue.js</span>
-            <span class="stack-item">Firebase</span>
-            <span class="stack-item">D3.js</span>
-          </div>
-        </div>
-
-        <div class="project-card fade-in">
-          <span class="project-icon">🔬</span>
-          <span class="project-tag tag-research">Research</span>
-          <h3>Async-First Culture</h3>
-          <p>비동기 중심의 글로벌 팀 운영 방법론 연구. 타임존을 넘어 효율적으로 협업하는 팀의 패턴을 분석합니다.</p>
-          <div class="project-stack">
-            <span class="stack-item">Notion</span>
-            <span class="stack-item">Loom</span>
-            <span class="stack-item">Linear</span>
-          </div>
-        </div>
-
-      </div>
+  <!-- ===== ABOUT ===== -->
+  <section class="about section" aria-labelledby="about-heading">
+    <div class="container about__inner">
+      <div class="about__icon" aria-hidden="true">🌱</div>
+      <h2 id="about-heading" class="section__title">Where It All Began</h2>
+      <p class="about__text">
+        Learning should never feel like a chore. I built these apps because I wanted
+        Leo Park to have a place where numbers, letters, and clocks come alive — where
+        every tap feels like an adventure, not a test. Each app was designed to meet
+        Leo exactly where he is, spark a little joy, and let him discover things at
+        his own pace.
+      </p>
+      <p class="about__text">
+        They are simple. They are small. But every pixel was placed with care.
+      </p>
     </div>
   </section>
 
-  <!-- Approach -->
-  <section id="approach">
+  <!-- ===== APP CARDS ===== -->
+  <section id="apps" class="apps section" aria-labelledby="apps-heading">
     <div class="container">
-      <p class="section-eyebrow fade-in">How I Work</p>
-      <h2 class="section-title fade-in">일하는 방식</h2>
-      <p class="section-subtitle fade-in">어디서든 연결되고, 언제든 실행합니다. 경계 없는 방식으로 가치를 만듭니다.</p>
+      <h2 id="apps-heading" class="section__title">The Five Explorers</h2>
+      <p class="section__subtitle">Pick one and start exploring — there is no wrong door.</p>
 
-      <div class="approach-grid">
-        <div class="approach-item fade-in">
-          <div class="approach-number">01</div>
-          <h3>능동적 문제 탐색</h3>
-          <p>지시를 기다리지 않습니다. 시장과 팀의 신호를 먼저 포착하고, 해결해야 할 문제를 주도적으로 정의합니다.</p>
-        </div>
-        <div class="approach-item fade-in">
-          <div class="approach-number">02</div>
-          <h3>빠른 실험 & 반복</h3>
-          <p>완벽한 계획보다 빠른 실행을. 2주 스프린트로 가설을 검증하고, 데이터를 바탕으로 방향을 조정합니다.</p>
-        </div>
-        <div class="approach-item fade-in">
-          <div class="approach-number">03</div>
-          <h3>인터렉티브 협업</h3>
-          <p>팀원 모두가 목소리를 낼 수 있는 환경을 만듭니다. 살아있는 문서와 투명한 커뮤니케이션이 핵심입니다.</p>
-        </div>
-        <div class="approach-item fade-in">
-          <div class="approach-number">04</div>
-          <h3>글로벌 원격 운영</h3>
-          <p>서울, 방콕, 리스본 어디서든 같은 퀄리티로 팀을 이끕니다. 타임존과 문화 차이를 강점으로 바꿉니다.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+      <div class="cards">
 
-  <!-- Terminal "Now" -->
-  <section class="terminal-section" id="terminal">
-    <div class="container">
-      <p class="section-eyebrow fade-in" style="text-align:center;">Now</p>
-      <h2 class="section-title fade-in" style="text-align:center;">지금 이 순간</h2>
-
-      <div class="terminal fade-in">
-        <div class="terminal-header">
-          <div class="dot dot-red"></div>
-          <div class="dot dot-yellow"></div>
-          <div class="dot dot-green"></div>
-          <span class="terminal-title">nomadongho ~ zsh</span>
-        </div>
-        <div class="terminal-body">
-          <span class="t-line"><span class="t-prompt">nomadongho@world</span><span class="t-cmd"> ~/projects</span> $ status --all</span>
-          <span class="t-line">&nbsp;</span>
-          <span class="t-line"><span class="t-green">✔</span> <span class="t-cyan">Nomad Hub</span> <span class="t-comment">— sprint 8/12 · 팀 5명 · on track</span></span>
-          <span class="t-line"><span class="t-green">✔</span> <span class="t-cyan">PM Assistant AI</span> <span class="t-comment">— beta testing · 23 users</span></span>
-          <span class="t-line"><span class="t-yellow">⟳</span> <span class="t-cyan">Roamboard</span> <span class="t-comment">— MVP 설계 중 · 2주 후 dev 착수</span></span>
-          <span class="t-line"><span class="t-yellow">⟳</span> <span class="t-cyan">Sprint Zero</span> <span class="t-comment">— 와이어프레임 리뷰 단계</span></span>
-          <span class="t-line">&nbsp;</span>
-          <span class="t-line"><span class="t-prompt">nomadongho@world</span><span class="t-cmd"> ~/projects</span> $ whoami</span>
-          <span class="t-line">&nbsp;</span>
-          <span class="t-line"><span class="t-comment">📍 현재 위치  :</span> <span class="t-green">서울, 대한민국</span></span>
-          <span class="t-line"><span class="t-comment">🕐 로컬 타임  :</span> <span class="t-green" id="local-time">loading...</span></span>
-          <span class="t-line"><span class="t-comment">🎯 이번 주 목표:</span> <span class="t-green">Nomad Hub v2.0 스프린트 리뷰 완료</span></span>
-          <span class="t-line"><span class="t-comment">☕ 상태        :</span> <span class="t-green">집중 모드 🔥</span></span>
-          <span class="t-line">&nbsp;</span>
-          <span class="t-line"><span class="t-prompt">nomadongho@world</span><span class="t-cmd"> ~/projects</span> $ <span class="typewriter" style="border-color:#a78bfa">_</span></span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact -->
-  <section id="contact">
-    <div class="container">
-      <div class="contact-wrapper fade-in">
-        <p class="section-eyebrow">Contact</p>
-        <h2 class="section-title">같이 만들어볼까요?</h2>
-        <p class="section-subtitle" style="margin: 0 auto;">
-          새로운 아이디어, 협업 제안, 아니면 그냥 안부 인사도 환영합니다.<br />
-          어디서든 연락 주세요.
-        </p>
-        <div class="contact-links">
-          <a href="https://github.com/nomadongho" class="contact-link" target="_blank" rel="noopener">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
-            GitHub
+        <!-- Math Explorer -->
+        <article class="card" aria-labelledby="math-title">
+          <div class="card__icon" aria-hidden="true">🔢</div>
+          <h3 id="math-title" class="card__title">Math Explorer</h3>
+          <p class="card__desc">
+            A playful space to practice numbers, counting, and early addition and subtraction — one step at a time.
+          </p>
+          <ul class="card__tags" aria-label="Features">
+            <li>Count &amp; Compare</li>
+            <li>Addition &amp; Subtraction</li>
+            <li>Visual Activities</li>
+          </ul>
+          <a href="./math-explorer/" class="btn btn--card" target="_blank" rel="noopener noreferrer">
+            Open App <span aria-hidden="true">→</span>
           </a>
-          <a href="mailto:hello@nomadongho.dev" class="contact-link">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            Email
+        </article>
+
+        <!-- English Explorer -->
+        <article class="card" aria-labelledby="english-title">
+          <div class="card__icon" aria-hidden="true">📖</div>
+          <h3 id="english-title" class="card__title">English Explorer</h3>
+          <p class="card__desc">
+            Letters, sounds, and first words — with audio to help Leo hear how English really sounds.
+          </p>
+          <ul class="card__tags" aria-label="Features">
+            <li>Alphabet &amp; Phonics</li>
+            <li>Sounds &amp; Listening</li>
+            <li>Early Word Reading</li>
+          </ul>
+          <a href="./english-explorer/" class="btn btn--card" target="_blank" rel="noopener noreferrer">
+            Open App <span aria-hidden="true">→</span>
           </a>
-          <a href="https://twitter.com/nomadongho" class="contact-link" target="_blank" rel="noopener">
-            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            X (Twitter)
+        </article>
+
+        <!-- Clock Explorer -->
+        <article class="card" aria-labelledby="clock-title">
+          <div class="card__icon" aria-hidden="true">🕐</div>
+          <h3 id="clock-title" class="card__title">Clock Explorer</h3>
+          <p class="card__desc">
+            An interactive clock for learning to tell time — move the hands, read the hours, and make time make sense.
+          </p>
+          <ul class="card__tags" aria-label="Features">
+            <li>Read the Clock</li>
+            <li>Set the Hands</li>
+            <li>Daily Time Skills</li>
+          </ul>
+          <a href="./clock-explorer/" class="btn btn--card" target="_blank" rel="noopener noreferrer">
+            Open App <span aria-hidden="true">→</span>
           </a>
+        </article>
+
+        <!-- Maori Explorer -->
+        <article class="card" aria-labelledby="maori-title">
+          <div class="card__icon" aria-hidden="true">🌿</div>
+          <h3 id="maori-title" class="card__title">Māori Explorer</h3>
+          <p class="card__desc">
+            Discover the beauty of Te Reo Māori — words, phrases, and sounds from the indigenous language of Aotearoa New Zealand.
+          </p>
+          <ul class="card__tags" aria-label="Features">
+            <li>Vocabulary &amp; Phrases</li>
+            <li>Sounds &amp; Pronunciation</li>
+            <li>Te Reo Māori</li>
+          </ul>
+          <a href="./maori-explorer/" class="btn btn--card" target="_blank" rel="noopener noreferrer">
+            Open App <span aria-hidden="true">→</span>
+          </a>
+        </article>
+
+        <!-- Korean Explorer -->
+        <article class="card" aria-labelledby="korean-title">
+          <div class="card__icon" aria-hidden="true">🇰🇷</div>
+          <h3 id="korean-title" class="card__title">Korean Explorer</h3>
+          <p class="card__desc">
+            Discover Korean words, sounds, and phrases — a playful introduction to Hangul and the language of Leo's heritage.
+          </p>
+          <ul class="card__tags" aria-label="Features">
+            <li>Vocabulary &amp; Phrases</li>
+            <li>Sounds &amp; Pronunciation</li>
+            <li>Hangul Basics</li>
+          </ul>
+          <a href="./korean-explorer/" class="btn btn--card" target="_blank" rel="noopener noreferrer">
+            Open App <span aria-hidden="true">→</span>
+          </a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== LEARNING JOURNEY ===== -->
+  <section class="journey section" aria-labelledby="journey-heading">
+    <div class="container">
+      <h2 id="journey-heading" class="section__title">Built for Leo's Learning Journey</h2>
+      <p class="section__subtitle">Each app targets a different part of early childhood learning.</p>
+
+      <div class="journey__grid">
+        <div class="journey__item fade-in">
+          <span class="journey__emoji" aria-hidden="true">🔢</span>
+          <h3 class="journey__label">Math Explorer</h3>
+          <p class="journey__detail">Numbers, counting, and early problem solving — the foundation of logical thinking.</p>
+        </div>
+        <div class="journey__item fade-in">
+          <span class="journey__emoji" aria-hidden="true">📖</span>
+          <h3 class="journey__label">English Explorer</h3>
+          <p class="journey__detail">Letters, sounds, and reading — building the language skills that open every other door.</p>
+        </div>
+        <div class="journey__item fade-in">
+          <span class="journey__emoji" aria-hidden="true">🕐</span>
+          <h3 class="journey__label">Clock Explorer</h3>
+          <p class="journey__detail">Time and daily life skills — understanding the clock is one of the first steps toward independence.</p>
+        </div>
+        <div class="journey__item fade-in">
+          <span class="journey__emoji" aria-hidden="true">🌿</span>
+          <h3 class="journey__label">Māori Explorer</h3>
+          <p class="journey__detail">Te Reo Māori words and phrases — discovering a new language opens a window into a whole new world and culture.</p>
+        </div>
+        <div class="journey__item fade-in">
+          <span class="journey__emoji" aria-hidden="true">🇰🇷</span>
+          <h3 class="journey__label">Korean Explorer</h3>
+          <p class="journey__detail">Korean words and Hangul — connecting Leo to the language and culture at the heart of his heritage.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer>
-    <p>© 2024 Nomadongho · Proudly built while traveling ✈️ · <a href="https://github.com/nomadongho/nomadongho.github.io">View on GitHub</a></p>
+  <!-- ===== CLOSING MESSAGE ===== -->
+  <section class="closing section" aria-labelledby="closing-heading">
+    <div class="container closing__inner">
+      <div class="closing__icon" aria-hidden="true">💛</div>
+      <h2 id="closing-heading" class="closing__title">To Leo</h2>
+      <p class="closing__text">
+        You are still so young, but you already ask questions that surprise me.
+        You want to know how things work, what numbers mean, what the little hand on the clock is doing.
+        I made these apps because I want to be part of that curiosity — to be there with you,
+        even in the small moments when you sit down and tap through something new.
+      </p>
+      <p class="closing__text">
+        Keep asking. Keep exploring. I'll keep building.
+      </p>
+      <p class="closing__signature">— Dad</p>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="container footer__inner">
+      <p class="footer__text">Made with love for Leo Park. 💛</p>
+      <p class="footer__copy">&copy; <span id="year"></span> nomadongho</p>
+      <p class="footer__contact">
+        Contact the developer:
+        <a id="link-suggest" class="footer__contact-link" href="#">Suggest an idea</a>
+        <span aria-hidden="true"> · </span>
+        <a id="link-report" class="footer__contact-link" href="#">Report a problem</a>
+      </p>
+    </div>
   </footer>
 
-  <script>
-    // ── Typewriter effect ──
-    const phrases = [
-      '디지털 세상을 누비는 프로젝트 매니저',
-      '아이디어를 실행으로 바꾸는 사람',
-      '팀을 움직이게 하는 촉진자',
-      '경계 없는 일상을 사는 노마드',
-    ];
-    let phraseIdx = 0, charIdx = 0, deleting = false;
-    const tw = document.getElementById('typewriter');
-
-    function typeLoop() {
-      const current = phrases[phraseIdx];
-      if (!deleting) {
-        tw.textContent = current.slice(0, charIdx + 1);
-        charIdx++;
-        if (charIdx === current.length) {
-          deleting = true;
-          setTimeout(typeLoop, 2200);
-          return;
-        }
-      } else {
-        tw.textContent = current.slice(0, charIdx - 1);
-        charIdx--;
-        if (charIdx === 0) {
-          deleting = false;
-          phraseIdx = (phraseIdx + 1) % phrases.length;
-        }
-      }
-      setTimeout(typeLoop, deleting ? 45 : 75);
-    }
-    typeLoop();
-
-    // ── Live clock ──
-    function updateClock() {
-      const el = document.getElementById('local-time');
-      if (!el) return;
-      const now = new Date();
-      el.textContent = now.toLocaleTimeString('ko-KR', {
-        timeZone: 'Asia/Seoul',
-        hour: '2-digit', minute: '2-digit', second: '2-digit',
-      });
-    }
-    updateClock();
-    setInterval(updateClock, 1000);
-
-    // ── Scroll animations ──
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry, index) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('visible'), index * 80);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-    // ── Counter animation ──
-    const counterObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const el = entry.target;
-        const target = parseInt(el.dataset.target, 10);
-        let current = 0;
-        const step = Math.ceil(target / 40);
-        const timer = setInterval(() => {
-          current = Math.min(current + step, target);
-          el.textContent = current + (target >= 10 ? '+' : '');
-          if (current >= target) clearInterval(timer);
-        }, 40);
-        counterObserver.unobserve(el);
-      });
-    }, { threshold: 0.5 });
-
-    document.querySelectorAll('.stat-number[data-target]').forEach(el => counterObserver.observe(el));
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>

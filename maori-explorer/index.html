@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Māori Explorer – a fun, playful beginner app for young children to start learning Te Reo Māori through listening, tapping, and simple games." />
+  <meta name="theme-color" content="#FF7043" />
+
+  <title>Māori Explorer – Learn Te Reo Māori</title>
+
+  <!-- Nunito from Google Fonts (loaded safely; no build step needed) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Favicon: inline SVG data URI for simplicity (no extra file needed) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+</head>
+<body>
+
+  <!-- Skip to main content for keyboard/screen reader users -->
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="app-header" role="banner">
+    <span class="logo-emoji" aria-hidden="true">🌿</span>
+    <div class="title-block">
+      <h1>Māori Explorer</h1>
+      <span class="tagline">Learn Te Reo Māori through play</span>
+    </div>
+    <!-- Stars counter -->
+    <div class="header-stars" aria-live="polite" aria-label="Stars earned">
+      ⭐ <span id="header-stars-count">0</span>
+    </div>
+    <!-- Home button (shown when not on home) -->
+    <button class="btn-home hidden" id="btn-header-home" aria-label="Go to home screen">
+      🏠 Home
+    </button>
+  </header>
+
+  <!-- ============================================================
+       MAIN CONTENT
+       ============================================================ -->
+  <main id="main-content">
+
+    <!-- ══════════════════════════════════════════════════════
+         VIEW: HOME
+         ══════════════════════════════════════════════════════ -->
+    <div id="view-home" class="view" role="region" aria-label="Home">
+
+      <!-- Hero section -->
+      <section class="hero" aria-label="Welcome">
+        <span class="hero-mascot" aria-hidden="true">🌿</span>
+        <h2>Māori Explorer</h2>
+        <p class="subtitle">A playful first step into Te Reo Māori</p>
+
+        <!-- Word of the Day card -->
+        <div class="wotd-card" aria-label="Word of the day">
+          <div id="wotd-content" aria-live="polite">
+            <!-- Rendered by renderWordOfDay() in script.js -->
+            <div class="wotd-label">✨ Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Overall progress bar -->
+      <section class="progress-section" aria-label="Your progress">
+        <div class="progress-label">Your progress</div>
+        <div class="progress-bar-outer" role="progressbar" aria-label="Overall progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress-bar-inner" id="overall-progress-bar" style="width:0%"></div>
+        </div>
+        <div class="progress-stats" id="progress-stats" aria-live="polite">
+          <!-- Rendered by renderProgressSummary() -->
+        </div>
+      </section>
+
+      <!-- Module grid -->
+      <section aria-label="Learning modules">
+        <div class="module-grid" id="module-grid" role="list">
+          <!-- Rendered by renderModuleCards() in script.js -->
+        </div>
+      </section>
+
+      <!-- Parent Corner -->
+      <section class="parent-corner" aria-label="Parent information">
+        <details>
+          <summary>For Parents &amp; Caregivers</summary>
+          <div class="parent-content">
+            <p><strong>What does this app teach?</strong></p>
+            <ul>
+              <li>Basic Te Reo Māori words: greetings, numbers, colors, family, animals, body parts, feelings</li>
+              <li>Pronunciation helpers for each word</li>
+              <li>Gentle listening-first approach – great for ages 4–7</li>
+            </ul>
+            <p style="margin-top:0.75rem;"><strong>How to use it together:</strong></p>
+            <ul>
+              <li>Sit with your child and listen to words together</li>
+              <li>Encourage them to repeat the word out loud</li>
+              <li>Celebrate every attempt – getting it wrong is fine!</li>
+              <li>Audio repetition works best: listen, repeat, listen again</li>
+            </ul>
+            <p style="margin-top:0.75rem;"><strong>Note:</strong> This is a gentle introductory app.
+              It is not a complete language course. Think of it as a warm, fun first taste of Te Reo Māori.</p>
+          </div>
+        </details>
+      </section>
+
+    </div>
+    <!-- / view-home -->
+
+
+    <!-- ══════════════════════════════════════════════════════
+         VIEW: MODULE (vocabulary learning)
+         ══════════════════════════════════════════════════════ -->
+    <div id="view-module" class="view" role="region" aria-label="Learning module">
+
+      <!-- Module header (dynamic) -->
+      <div class="module-header" id="module-view-header">
+        <!-- Rendered by renderModuleView() -->
+      </div>
+
+      <!-- Vocabulary cards grid -->
+      <div class="vocab-grid" id="vocab-grid" role="list" aria-label="Vocabulary cards">
+        <!-- Rendered by renderModuleView() -->
+      </div>
+
+      <!-- Game launch buttons -->
+      <div class="module-actions" id="module-view-actions">
+        <!-- Rendered by renderModuleView() -->
+      </div>
+
+      <!-- Back button -->
+      <div style="padding:0 1rem 1rem;text-align:center;">
+        <button class="btn-secondary" id="btn-module-back" aria-label="Back to home">
+          ← Back
+        </button>
+      </div>
+
+    </div>
+    <!-- / view-module -->
+
+
+    <!-- ══════════════════════════════════════════════════════
+         VIEW: MINI GAMES menu
+         ══════════════════════════════════════════════════════ -->
+    <div id="view-mini-games" class="view" role="region" aria-label="Mini games">
+
+      <div class="games-header">
+        <div class="games-big-emoji" aria-hidden="true">🎮</div>
+        <h2>Mini Games</h2>
+        <p>Play, listen, and learn!</p>
+      </div>
+
+      <div class="games-grid" id="games-grid" role="list" aria-label="Available games">
+        <!-- Rendered by renderMiniGamesMenu() -->
+      </div>
+
+      <!-- Back button -->
+      <div style="padding:0 1rem 1.5rem;text-align:center;">
+        <button class="btn-secondary" id="btn-games-back" aria-label="Back to home">
+          ← Back
+        </button>
+      </div>
+
+    </div>
+    <!-- / view-mini-games -->
+
+
+    <!-- ══════════════════════════════════════════════════════
+         VIEW: GAME PLAY (in-game screen)
+         ══════════════════════════════════════════════════════ -->
+    <div id="view-game-play" class="view" role="region" aria-label="Game in progress">
+
+      <!-- Back to games button -->
+      <div style="padding:0.75rem 1rem 0;">
+        <button class="btn-secondary" id="btn-game-play-back" aria-label="Back to games menu">
+          ← Games
+        </button>
+      </div>
+
+      <!-- Dynamic game content -->
+      <div class="game-play-area" id="game-play-content" aria-live="polite">
+        <!-- Rendered by game functions in script.js -->
+      </div>
+
+    </div>
+    <!-- / view-game-play -->
+
+
+    <!-- ══════════════════════════════════════════════════════
+         VIEW: REWARDS
+         ══════════════════════════════════════════════════════ -->
+    <div id="view-rewards" class="view" role="region" aria-label="My rewards">
+
+      <div class="rewards-header">
+        <div style="font-size:3rem;margin-bottom:0.3rem;">⭐</div>
+        <h2>My Stars &amp; Badges</h2>
+        <p>Keep exploring to earn more!</p>
+      </div>
+
+      <div class="rewards-section">
+
+        <!-- Star count -->
+        <div class="star-count-display">
+          <div class="star-big">⭐</div>
+          <div class="star-number" id="rewards-star-number">0</div>
+          <div class="star-label">Stars earned</div>
+        </div>
+
+        <!-- Badges -->
+        <h3>🏅 Badges</h3>
+        <div class="badges-grid" id="badges-grid" role="list" aria-label="Earned badges">
+          <!-- Rendered by renderRewardsView() -->
+        </div>
+
+        <!-- Module progress -->
+        <h3>📊 Module Progress</h3>
+        <div class="module-progress-list" id="module-progress-list">
+          <!-- Rendered by renderRewardsView() -->
+        </div>
+
+        <!-- Reset button -->
+        <button class="btn-reset-progress" id="btn-reset-progress" aria-label="Reset all progress">
+          🔄 Reset my progress
+        </button>
+
+      </div>
+
+      <!-- Back button -->
+      <div style="padding:0.5rem 1rem 1.5rem;text-align:center;">
+        <button class="btn-secondary" onclick="showView('home'); renderHome(); setHeaderShowHome(false);" aria-label="Back to home">
+          ← Back
+        </button>
+      </div>
+
+    </div>
+    <!-- / view-rewards -->
+
+  </main>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="app-footer" role="contentinfo">
+    <p>Made with ❤️ for young learners of Te Reo Māori</p>
+    <p style="margin-top:0.25rem;font-size:0.7rem;">
+      Māori Explorer is a free beginner learning tool. Not affiliated with any official language authority.
+    </p>
+
+    <!-- Feedback links -->
+    <div class="feedback-section" aria-label="Feedback">
+      <a
+        class="feedback-link"
+        href="mailto:nomadongho@gmail.com?subject=M%C4%81ori%20Explorer%20-%20Suggestion&body=Hi%2C%20I%20have%20a%20suggestion%20for%20M%C4%81ori%20Explorer%3A%0A%0A"
+        aria-label="Send a suggestion by email"
+      >
+        💡 Suggest an idea
+      </a>
+      <a
+        class="feedback-link"
+        href="mailto:nomadongho@gmail.com?subject=M%C4%81ori%20Explorer%20-%20Bug%20Report&body=Hi%2C%20I%20found%20a%20problem%20with%20M%C4%81ori%20Explorer%3A%0A%0A"
+        aria-label="Report a problem by email"
+      >
+        🐛 Report a problem
+      </a>
+    </div>
+  </footer>
+
+  <!-- Confetti canvas (full-page overlay, pointer-events: none) -->
+  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+  <!-- Bottom ad bar (hidden by default; shown on non-home views when ads are enabled) -->
+  <div id="ad-bar" class="ad-bar" aria-hidden="true"></div>
+
+  <!-- env.js must load before data.js so ADS_ENABLED is defined in time -->
+  <script src="env.js"></script>
+  <!-- Data first, then main script -->
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+
+</body>
+</html>

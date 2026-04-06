@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#FFF8F0" />
+  <title>Math Explorer 🚀</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     CONFETTI CONTAINER (shared, fixed overlay)
+══════════════════════════════════════════════════════════════ -->
+<div id="confetti-container" class="confetti-container" aria-hidden="true"></div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     LEVEL-UP CELEBRATION OVERLAY
+══════════════════════════════════════════════════════════════ -->
+<div id="levelup-overlay" class="levelup-overlay" role="dialog" aria-modal="true" aria-label="Level Up!">
+  <div class="levelup-box">
+    <div class="levelup-emoji">🎉</div>
+    <div class="levelup-title">Level Up!</div>
+    <div id="levelup-sub" class="levelup-sub">You reached Level <strong id="levelup-new">2</strong>!</div>
+    <button class="btn-action primary" onclick="UI.closeLevelUp()">Keep Going 🚀</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PARENT GATE MODAL
+══════════════════════════════════════════════════════════════ -->
+<div id="parent-gate-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Parent Check">
+  <div class="modal-box" style="max-width:340px">
+    <div class="modal-header">
+      <h2>Parent Check 🔒</h2>
+      <button class="btn-close-modal" onclick="UI.closeParentGate()" aria-label="Close">✕</button>
+    </div>
+    <div class="parent-gate">
+      <p style="margin-bottom:16px;font-weight:600;color:#666">Hold the button below for 2 seconds!</p>
+      <button id="gate-hold-btn" class="gate-hold-btn"
+              onmousedown="UI.gateHoldStart()"
+              onmouseup="UI.gateHoldEnd()"
+              onmouseleave="UI.gateHoldEnd()"
+              ontouchstart="UI.gateHoldStart(event)"
+              ontouchend="UI.gateHoldEnd()"
+              aria-label="Hold for 2 seconds">
+        <span>Hold!</span>
+        <div id="gate-hold-progress" class="gate-hold-progress"></div>
+      </button>
+      <div id="gate-instruction" class="gate-instruction">Hold the button</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SETTINGS / PARENT MODAL
+══════════════════════════════════════════════════════════════ -->
+<div id="settings-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Settings">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>Settings ⚙️</h2>
+      <button class="btn-close-modal" onclick="UI.closeSettings()" aria-label="Close">✕</button>
+    </div>
+
+    <!-- Stats -->
+    <div style="background:#f9f9f9;border-radius:12px;padding:14px;margin-bottom:16px">
+      <h3 style="margin-bottom:10px;font-size:1rem">📊 Learning Stats</h3>
+      <div id="settings-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.85rem;font-weight:700"></div>
+    </div>
+
+    <!-- Sound toggle -->
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">🔊 Sound</div>
+        <div class="setting-desc">Voice support (coming soon)</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-sound" onchange="AppState.setSetting('sound', this.checked)" />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <!-- Animation toggle -->
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">✨ Animations</div>
+        <div class="setting-desc">Turn screen effects on/off</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-anim" onchange="AppState.setSetting('animations', this.checked)" checked />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <!-- Advanced mode toggle -->
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">🔢 Advanced Number Demo</div>
+        <div class="setting-desc">Enable 100-digit number experience</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-advanced" onchange="AppState.setSetting('advancedMode', this.checked)" />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
+    <!-- Difficulty select -->
+    <div class="setting-row">
+      <div>
+        <div class="setting-label">🎮 Starting Difficulty</div>
+        <div class="setting-desc">Adjust problem level</div>
+      </div>
+      <select class="setting-select" id="select-difficulty" onchange="AppState.setSetting('startDifficulty', Number(this.value))">
+        <option value="1">Beginner (1)</option>
+        <option value="3">Easy (3)</option>
+        <option value="5">Medium (5)</option>
+        <option value="8">Hard (8)</option>
+      </select>
+    </div>
+
+    <!-- Big number demo (shown if advancedMode is on) -->
+    <div id="bignum-demo-area" class="hidden mt-md">
+      <h3 style="margin-bottom:10px;font-size:1rem">🔢 100-Digit Number Demo</h3>
+      <div class="bignum-demo">
+        <div class="bignum-label">Number A (50 digits)</div>
+        <div id="bignum-A" class="bignum-display"></div>
+        <div class="bignum-label">Number B (50 digits)</div>
+        <div id="bignum-B" class="bignum-display"></div>
+        <div class="bignum-label">A + B =</div>
+        <div id="bignum-sum" class="bignum-display" style="color:#6BCB77"></div>
+        <div class="bignum-label">A in English</div>
+        <div id="bignum-korean" class="bignum-display" style="color:#CC5DE8;font-family:var(--font);font-size:0.85rem"></div>
+        <div class="bignum-label">A digit groups</div>
+        <div id="bignum-groups" class="bignum-display" style="color:#4D96FF;word-break:break-all"></div>
+      </div>
+      <button class="btn-action secondary mt-sm" onclick="UI.refreshBignumDemo()">🔄 New Numbers</button>
+    </div>
+
+    <!-- Reset button -->
+    <button class="btn-action danger mt-md" onclick="UI.confirmReset()">🗑️ Reset Progress</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     HOME SCREEN
+══════════════════════════════════════════════════════════════ -->
+<div id="home-screen" class="screen active" role="main">
+  <div class="home-header">
+    <div class="app-title">Math Explorer 🚀</div>
+    <button class="btn-parent" id="btn-open-parent" onclick="UI.openParentGate()"
+            aria-label="Parent settings" title="Parent settings">⚙️</button>
+  </div>
+
+  <!-- Stats bar -->
+  <div class="stats-bar">
+    <div class="stat-chip">
+      <span class="stat-icon">⭐</span>
+      <span id="home-level-label">Level <span id="home-level">1</span></span>
+    </div>
+    <div class="stat-chip">
+      <span class="stat-icon">💎</span>
+      <span id="home-points">0</span> pts
+    </div>
+    <div class="stat-chip">
+      <span class="stat-icon">🔥</span>
+      <span id="home-streak">0</span> streak
+    </div>
+  </div>
+
+  <!-- Level progress -->
+  <div class="level-progress-wrap">
+    <div class="level-progress-label">
+      <span>Level <span id="home-lvl-cur">1</span></span>
+      <span><span id="home-lvl-pts-cur">0</span> / <span id="home-lvl-pts-next">100</span> pts</span>
+    </div>
+    <div class="progress-bar">
+      <div id="home-lvl-bar" class="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Mode cards -->
+  <div class="mode-grid" role="list">
+    <button class="mode-card" data-mode="numberRead" onclick="UI.startMode('numberRead')" role="listitem" aria-label="Number Reading mode">
+      <div class="mode-card-icon">🔢</div>
+      <div class="mode-card-label">Number Reading</div>
+    </button>
+    <button class="mode-card" data-mode="counting" onclick="UI.startMode('counting')" role="listitem" aria-label="Counting mode">
+      <div class="mode-card-icon">🍎</div>
+      <div class="mode-card-label">Counting</div>
+    </button>
+    <button class="mode-card" data-mode="addition" onclick="UI.startMode('addition')" role="listitem" aria-label="Addition mode">
+      <div class="mode-card-icon">➕</div>
+      <div class="mode-card-label">Addition</div>
+    </button>
+    <button class="mode-card" data-mode="subtraction" onclick="UI.startMode('subtraction')" role="listitem" aria-label="Subtraction mode">
+      <div class="mode-card-icon">➖</div>
+      <div class="mode-card-label">Subtraction</div>
+    </button>
+    <button class="mode-card" data-mode="placeValue" onclick="UI.startMode('placeValue')" role="listitem" aria-label="Place Value mode">
+      <div class="mode-card-icon">📦</div>
+      <div class="mode-card-label">Place Value</div>
+    </button>
+    <button class="mode-card" data-mode="blocks3d" onclick="UI.startMode('blocks3d')" role="listitem" aria-label="3D Block Counting mode">
+      <div class="mode-card-icon">🧊</div>
+      <div class="mode-card-label">3D Blocks</div>
+    </button>
+    <button class="mode-card" data-mode="rewards" onclick="UI.showScreen('rewards-screen')" role="listitem" aria-label="Rewards and level">
+      <div class="mode-card-icon">🏆</div>
+      <div class="mode-card-label">Rewards</div>
+    </button>
+  </div>
+
+  <!-- Earned badges strip -->
+  <div id="home-badges" class="badges-strip mt-md" aria-label="Earned badges"></div>
+
+  <!-- Developer contact footer -->
+  <footer class="dev-footer">
+    <span>Contact the developer:</span>
+    <a id="dev-link-suggest" class="dev-footer-link">Suggest an idea</a>
+    <span class="dev-footer-sep" aria-hidden="true">·</span>
+    <a id="dev-link-report" class="dev-footer-link">Report a problem</a>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     NUMBER READING SCREEN
+══════════════════════════════════════════════════════════════ -->
+<div id="numberRead-screen" class="screen quiz-screen" role="main">
+  <div class="quiz-header">
+    <button class="btn-back" onclick="UI.goHome()" aria-label="Home">◀</button>
+    <div class="quiz-title">🔢 Number Reading</div>
+    <div class="score-badge">⭐ <span id="nr-score">0</span></div>
+  </div>
+  <div class="question-card" id="nr-question-card">
+    <div id="nr-instruction" class="question-instruction"></div>
+    <div id="nr-display" class="question-number-big"></div>
+    <button id="nr-speak-btn" class="btn-helper" onclick="UI.speakCurrentProblem()" aria-label="Read aloud">🔊 Read Aloud</button>
+  </div>
+  <div class="choices" id="nr-choices" role="group" aria-label="Choices"></div>
+  <div class="feedback-msg" id="nr-feedback" aria-live="polite"></div>
+  <div class="streak-display" id="nr-streak" aria-live="polite"></div>
+  <button class="btn-next" id="nr-next" onclick="UI.nextQuestion('numberRead')">Next ➡️</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     COUNTING SCREEN
+══════════════════════════════════════════════════════════════ -->
+<div id="counting-screen" class="screen quiz-screen" role="main">
+  <div class="quiz-header">
+    <button class="btn-back" onclick="UI.goHome()" aria-label="Home">◀</button>
+    <div class="quiz-title">🍎 Counting</div>
+    <div class="score-badge">⭐ <span id="cnt-score">0</span></div>
+  </div>
+  <div class="question-card">
+    <div class="question-instruction">How many are there?</div>
+    <div id="cnt-emoji-grid" class="emoji-grid" role="img" aria-label="Count these"></div>
+  </div>
+  <button id="cnt-helper-btn" class="btn-helper mb-md" onclick="UI.countOneByOne()" aria-label="Count one by one">👆 Count One by One</button>
+  <div class="choices" id="cnt-choices" role="group" aria-label="Choices"></div>
+  <div class="feedback-msg" id="cnt-feedback" aria-live="polite"></div>
+  <div class="streak-display" id="cnt-streak" aria-live="polite"></div>
+  <button class="btn-next" id="cnt-next" onclick="UI.nextQuestion('counting')">Next ➡️</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     ADDITION SCREEN
+══════════════════════════════════════════════════════════════ -->
+<div id="addition-screen" class="screen quiz-screen" role="main">
+  <div class="quiz-header">
+    <button class="btn-back" onclick="UI.goHome()" aria-label="Home">◀</button>
+    <div class="quiz-title">➕ Addition</div>
+    <div class="score-badge">⭐ <span id="add-score">0</span></div>
+  </div>
+  <div class="question-card" id="add-question-card">
+    <div id="add-visual-area" class="add-visual hidden"></div>
+    <div id="add-expr" class="math-expr"></div>
+  </div>
+  <button id="add-helper-btn" class="btn-helper mb-md" onclick="UI.toggleAddVisual()" aria-label="Show blocks">🧊 Show Blocks</button>
+  <div class="choices" id="add-choices" role="group" aria-label="Choices"></div>
+  <div class="feedback-msg" id="add-feedback" aria-live="polite"></div>
+  <div class="streak-display" id="add-streak" aria-live="polite"></div>
+  <button class="btn-next" id="add-next" onclick="UI.nextQuestion('addition')">Next ➡️</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SUBTRACTION SCREEN
+══════════════════════════════════════════════════════════════ -->
+<div id="subtraction-screen" class="screen quiz-screen" role="main">
+  <div class="quiz-header">
+    <button class="btn-back" onclick="UI.goHome()" aria-label="Home">◀</button>
+    <div class="quiz-title">➖ Subtraction</div>
+    <div class="score-badge">⭐ <span id="sub-score">0</span></div>
+  </div>
+  <div class="question-card" id="sub-question-card">
+    <div id="sub-visual-area" class="add-visual hidden"></div>
+    <div id="sub-expr" class="math-expr"></div>
+  </div>
+  <button id="sub-helper-btn" class="btn-helper mb-md" onclick="UI.toggleSubVisual()" aria-label="Show blocks">🧊 Show Blocks</button>
+  <div class="choices" id="sub-choices" role="group" aria-label="Choices"></div>
+  <div class="feedback-msg" id="sub-feedback" aria-live="polite"></div>
+  <div class="streak-display" id="sub-streak" aria-live="polite"></div>
+  <button class="btn-next" id="sub-next" onclick="UI.nextQuestion('subtraction')">Next ➡️</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PLACE VALUE SCREEN
+══════════════════════════════════════════════════════════════ -->
+<div id="placeValue-screen" class="screen quiz-screen" role="main">
+  <div class="quiz-header">
+    <button class="btn-back" onclick="UI.goHome()" aria-label="Home">◀</button>
+    <div class="quiz-title">📦 Place Value</div>
+    <div class="score-badge">⭐ <span id="pv-score">0</span></div>
+  </div>
+  <div class="question-card">
+    <div class="question-instruction" id="pv-instruction"></div>
+    <div class="question-number-big" id="pv-number"></div>
+    <div id="pv-visual" class="place-value-visual"></div>
+  </div>
+  <div class="choices" id="pv-choices" role="group" aria-label="Choices"></div>
+  <div class="feedback-msg" id="pv-feedback" aria-live="polite"></div>
+  <div class="streak-display" id="pv-streak" aria-live="polite"></div>
+  <button class="btn-next" id="pv-next" onclick="UI.nextQuestion('placeValue')">Next ➡️</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     3D BLOCKS SCREEN
+══════════════════════════════════════════════════════════════ -->
+<div id="blocks3d-screen" class="screen quiz-screen" role="main">
+  <div class="quiz-header">
+    <button class="btn-back" onclick="UI.goHome()" aria-label="Home">◀</button>
+    <div class="quiz-title">🧊 3D Block Count</div>
+    <div class="score-badge">⭐ <span id="b3d-score">0</span></div>
+  </div>
+  <div class="question-card" style="padding:12px 8px">
+    <div class="question-instruction">Count the blocks! Drag to rotate and look for hidden ones!</div>
+    <div id="blocks3d-container" class="blocks3d-container" role="img" aria-label="3D block structure — drag to rotate"></div>
+  </div>
+  <div class="blocks3d-controls">
+    <button class="btn-3d-ctrl" onclick="UI.resetBlock3DView()" aria-label="Reset view">🔄 Reset View</button>
+    <button class="btn-3d-ctrl" onclick="UI.toggleAutoSpin()" id="btn-autospin" aria-label="Auto rotate">▶ Auto Rotate</button>
+  </div>
+  <div class="choices" id="b3d-choices" role="group" aria-label="Choices"></div>
+  <div class="feedback-msg" id="b3d-feedback" aria-live="polite"></div>
+  <div class="streak-display" id="b3d-streak" aria-live="polite"></div>
+  <button class="btn-next" id="b3d-next" onclick="UI.nextQuestion('blocks3d')">Next ➡️</button>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     REWARDS / LEVEL SCREEN
+══════════════════════════════════════════════════════════════ -->
+<div id="rewards-screen" class="screen" role="main">
+  <div class="quiz-header">
+    <button class="btn-back" onclick="UI.goHome()" aria-label="Home">◀</button>
+    <div class="quiz-title">🏆 Rewards &amp; Level</div>
+  </div>
+  <div class="rewards-header">
+    <div class="big-level-display" id="rew-level">1</div>
+    <div style="font-weight:700;color:#666;font-size:1rem">Level</div>
+  </div>
+
+  <!-- Level progress -->
+  <div class="level-progress-wrap mb-md">
+    <div class="level-progress-label">
+      <span>Level <span id="rew-lvl-cur">1</span></span>
+      <span><span id="rew-lvl-pts-cur">0</span> / <span id="rew-lvl-pts-next">100</span> pts</span>
+    </div>
+    <div class="progress-bar">
+      <div id="rew-lvl-bar" class="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="rewards-stats-grid">
+    <div class="rewards-stat">
+      <div class="rs-val" id="rew-total">0</div>
+      <div class="rs-label">Questions</div>
+    </div>
+    <div class="rewards-stat">
+      <div class="rs-val" id="rew-correct">0</div>
+      <div class="rs-label">Correct</div>
+    </div>
+    <div class="rewards-stat">
+      <div class="rs-val" id="rew-accuracy">0%</div>
+      <div class="rs-label">Accuracy</div>
+    </div>
+    <div class="rewards-stat">
+      <div class="rs-val" id="rew-maxstreak">0</div>
+      <div class="rs-label">Best Streak</div>
+    </div>
+  </div>
+
+  <!-- Badges -->
+  <h3 style="text-align:center;margin:16px 0 10px">🏅 Badges</h3>
+  <div class="badges-grid" id="rew-badges" role="list" aria-label="Badge list"></div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCRIPTS — load modules then main app
+══════════════════════════════════════════════════════════════ -->
+<script>
+  /* Developer contact footer — update APP_TITLE per project */
+  (function () {
+    var APP_TITLE    = 'Math Explorer';
+    var CONTACT_EMAIL = 'nomadongho@gmail.com';
+    var enc = encodeURIComponent;
+    var suggestHref =
+      'mailto:' + CONTACT_EMAIL +
+      '?subject=' + enc('[' + APP_TITLE + '] Suggestion') +
+      '&body='    + enc('Hi,\n\nI have an idea for ' + APP_TITLE + ':\n\n...\n');
+    var reportHref =
+      'mailto:' + CONTACT_EMAIL +
+      '?subject=' + enc('[' + APP_TITLE + '] Bug Report') +
+      '&body='    + enc('Hi,\n\nI found a problem in ' + APP_TITLE + '.\n\nWhat happened:\n...\n\nDevice/browser:\n...\n');
+    document.getElementById('dev-link-suggest').href = suggestHref;
+    document.getElementById('dev-link-report').href  = reportHref;
+  })();
+</script>
+<script src="modules/bignum.js"></script>
+<script src="modules/rewards.js"></script>
+<script src="modules/problems.js"></script>
+<script src="modules/blocks3d.js"></script>
+<script src="js/ad-config.js"></script>
+<script src="../shared/ad-manager.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

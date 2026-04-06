@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Number Explorer 🔢 | Korean Explorer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <a class="logo" href="index.html">
+    <span class="logo-icon">🇰🇷</span>
+    <span class="logo-text">Korean Explorer</span>
+  </a>
+  <nav>
+    <a href="hangul.html">🔤 Hangul</a>
+    <a href="words.html">🐱 Words</a>
+    <a href="numbers.html">🔢 Numbers</a>
+    <a href="phrases.html">💬 Phrases</a>
+    <a href="games.html">🎮 Games</a>
+  </nav>
+</header>
+
+<main>
+  <div class="progress-widget">
+    <div class="level-badge" id="level-display">Level 1</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-bar-fill" style="width:0%"></div>
+    </div>
+    <div class="points-display" id="points-display">⭐ 0 pts</div>
+    <div class="stars-display" id="stars-display"></div>
+  </div>
+
+  <div class="page-title">
+    <div class="page-emoji">🔢</div>
+    <h1>Number Explorer</h1>
+    <p>Count 1 to 20 in Korean!</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showNumTab('learn', this)">📖 Learn</button>
+    <button class="tab-btn" onclick="showNumTab('count', this)">🌟 Count</button>
+    <button class="tab-btn" onclick="showNumTab('quiz', this)">❓ Quiz</button>
+  </div>
+
+  <!-- ── LEARN TAB ── -->
+  <div id="tab-learn" class="tab-content">
+    <div class="card" style="padding:28px; text-align:center">
+      <div class="number-display">
+        <div class="number-big" id="num-arabic"></div>
+        <div class="number-korean" id="num-korean"></div>
+        <div class="number-english" id="num-english"></div>
+        <div class="number-english" style="font-size:1rem; color:#bbb" id="num-native"></div>
+      </div>
+      <div class="counting-objects" id="counting-objects"></div>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:16px">
+        <button class="btn btn-secondary btn-sm" onclick="changeNum(-1)">⬅ Prev</button>
+        <button class="btn btn-primary" onclick="playNumber()">🔊 Hear it!</button>
+        <button class="btn btn-accent" onclick="repeatNumber()">🗣️ Repeat After Me!</button>
+        <button class="btn btn-secondary btn-sm" onclick="changeNum(1)">Next ➡</button>
+      </div>
+    </div>
+
+    <!-- Number grid -->
+    <div style="margin-top:20px">
+      <h3 style="color:var(--purple); margin-bottom:12px">All Numbers:</h3>
+      <div class="letter-grid" id="number-grid" style="grid-template-columns: repeat(auto-fill, minmax(70px,1fr))"></div>
+    </div>
+  </div>
+
+  <!-- ── COUNT TAB ── -->
+  <div id="tab-count" class="tab-content" style="display:none">
+    <div class="card" style="padding:24px; text-align:center">
+      <h2 style="color:var(--purple); margin-bottom:8px">How many? 🤔</h2>
+      <p style="color:#888; margin-bottom:16px">Count the objects and tap the right number!</p>
+      <button class="btn btn-orange" onclick="newCountQuestion()" style="margin-bottom:20px">🔄 New Question</button>
+
+      <div id="count-objects" class="counting-objects" style="font-size:3rem; margin:20px 0"></div>
+      <div id="count-question" style="font-size:1.3rem; color:#555; margin-bottom:16px"></div>
+      <div class="quiz-options" id="count-options"></div>
+    </div>
+  </div>
+
+  <!-- ── QUIZ TAB ── -->
+  <div id="tab-quiz" class="tab-content" style="display:none">
+    <div class="card" style="padding:24px; text-align:center">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px">
+        <h2 style="color:var(--purple)">Quiz Time! ❓</h2>
+        <div>Score: <strong id="quiz-score">0</strong> / <strong id="quiz-total">10</strong></div>
+      </div>
+      <button class="btn btn-orange" onclick="startQuiz()" style="margin-bottom:16px">🔄 New Quiz</button>
+
+      <div id="quiz-area">
+        <div id="quiz-prompt" style="font-size:1.3rem; color:#555; margin-bottom:8px"></div>
+        <div id="quiz-korean" style="font-size:3rem; color:var(--primary); font-weight:bold; margin-bottom:20px"></div>
+        <div class="quiz-options" id="quiz-options"></div>
+      </div>
+
+      <div id="quiz-done" style="display:none; padding:20px">
+        <div class="scoreboard">
+          <div class="score-big" id="quiz-final-score"></div>
+          <div class="score-label">out of 10</div>
+          <div class="stars-row" id="quiz-stars"></div>
+        </div>
+        <button class="btn btn-primary btn-lg" onclick="startQuiz()">Play Again! 🔄</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="ad-banner"></div>
+<div id="toast"></div>
+
+<footer>
+  <p><a href="mailto:nomadongho@gmail.com?subject=Korean Explorer Feedback">✉️ Send feedback to developer</a></p>
+</footer>
+
+<script src="audio.js"></script>
+<script src="progress.js"></script>
+<script src="script.js"></script>
+<script src="../shared/ad-manager.js"></script>
+<script src="js/ad-config.js"></script>
+<script src="ads.js"></script>
+<script>
+const numbers = [
+  { n:1,  korean:'일',    native:'하나', english:'One' },
+  { n:2,  korean:'이',    native:'둘',   english:'Two' },
+  { n:3,  korean:'삼',    native:'셋',   english:'Three' },
+  { n:4,  korean:'사',    native:'넷',   english:'Four' },
+  { n:5,  korean:'오',    native:'다섯', english:'Five' },
+  { n:6,  korean:'육',    native:'여섯', english:'Six' },
+  { n:7,  korean:'칠',    native:'일곱', english:'Seven' },
+  { n:8,  korean:'팔',    native:'여덟', english:'Eight' },
+  { n:9,  korean:'구',    native:'아홉', english:'Nine' },
+  { n:10, korean:'십',    native:'열',   english:'Ten' },
+  { n:11, korean:'십일',  native:'열하나', english:'Eleven' },
+  { n:12, korean:'십이',  native:'열둘',   english:'Twelve' },
+  { n:13, korean:'십삼',  native:'열셋',   english:'Thirteen' },
+  { n:14, korean:'십사',  native:'열넷',   english:'Fourteen' },
+  { n:15, korean:'십오',  native:'열다섯', english:'Fifteen' },
+  { n:16, korean:'십육',  native:'열여섯', english:'Sixteen' },
+  { n:17, korean:'십칠',  native:'열일곱', english:'Seventeen' },
+  { n:18, korean:'십팔',  native:'열여덟', english:'Eighteen' },
+  { n:19, korean:'십구',  native:'열아홉', english:'Nineteen' },
+  { n:20, korean:'이십',  native:'스물',   english:'Twenty' },
+];
+
+const countEmojis = ['⭐','🍎','🐱','🎈','🌸','🦋','🍬','🐶','🌟','🎯'];
+let currentNumIndex = 0;
+let quizIndex = 0;
+let quizScore = 0;
+let quizAnswered = false;
+
+// ── Tab switching ──────────────────────────────
+function showNumTab(tab, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+  document.querySelectorAll('.tabs .tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).style.display = '';
+  btn.classList.add('active');
+
+  if (tab === 'count') newCountQuestion();
+  if (tab === 'quiz')  startQuiz();
+}
+
+// ── Learn ──────────────────────────────────────
+function renderNumber() {
+  const num = numbers[currentNumIndex];
+  document.getElementById('num-arabic').textContent  = num.n;
+  document.getElementById('num-korean').textContent  = num.korean;
+  document.getElementById('num-english').textContent = num.english;
+  document.getElementById('num-native').textContent  = '(native: ' + num.native + ')';
+
+  const emoji = countEmojis[currentNumIndex % countEmojis.length];
+  document.getElementById('counting-objects').textContent = emoji.repeat(num.n);
+
+  // update grid
+  document.querySelectorAll('.num-tile').forEach((t, i) => {
+    t.classList.toggle('selected', i === currentNumIndex);
+  });
+}
+
+function changeNum(dir) {
+  currentNumIndex = (currentNumIndex + dir + numbers.length) % numbers.length;
+  renderNumber();
+}
+
+function playNumber() {
+  const num = numbers[currentNumIndex];
+  AudioManager.speakKorean(num.korean);
+  const result = ProgressManager.addPoints(5);
+  if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+}
+
+function repeatNumber() {
+  const num = numbers[currentNumIndex];
+  AudioManager.speakEnglish('The number ' + num.n + ' in Korean is: ');
+  setTimeout(() => AudioManager.speakKorean(num.korean), 1600);
+  showToast('🗣️ Say it!', 'info');
+}
+
+// ── Number grid ────────────────────────────────
+function renderNumberGrid() {
+  const grid = document.getElementById('number-grid');
+  grid.innerHTML = '';
+  numbers.forEach((num, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'letter-tile num-tile' + (i === 0 ? ' selected' : '');
+    tile.innerHTML = `<div class="lt-char" style="font-size:1.2rem">${num.n}</div><div class="lt-roman">${num.korean}</div>`;
+    tile.onclick = () => { currentNumIndex = i; renderNumber(); };
+    grid.appendChild(tile);
+  });
+}
+
+// ── Count game ─────────────────────────────────
+function newCountQuestion() {
+  const num = numbers[Math.floor(Math.random() * 10)]; // 1-10 for counting
+  const emoji = countEmojis[Math.floor(Math.random() * countEmojis.length)];
+  document.getElementById('count-objects').textContent = emoji.repeat(num.n);
+  document.getElementById('count-question').textContent = `How many ${emoji} do you see?`;
+
+  const opts = generateOptions(num, 4);
+  const container = document.getElementById('count-options');
+  container.innerHTML = '';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = o.korean + ' (' + o.n + ')';
+    btn.onclick = () => checkCountAnswer(btn, o, num, container);
+    container.appendChild(btn);
+  });
+}
+
+function checkCountAnswer(btn, chosen, correct, container) {
+  if (container.dataset.answered) return;
+  container.dataset.answered = 'true';
+
+  if (chosen.n === correct.n) {
+    btn.classList.add('correct');
+    showToast('Correct! 🎉 +10 pts', 'correct');
+    AudioManager.speakKorean(correct.korean);
+    const result = ProgressManager.addPoints(10);
+    if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+    setTimeout(() => { container.dataset.answered = ''; newCountQuestion(); }, 1200);
+  } else {
+    btn.classList.add('wrong');
+    showToast('Not quite! Try again 🙂', 'wrong');
+    AudioManager.speakEnglish('Try again');
+    setTimeout(() => {
+      btn.classList.remove('wrong');
+      container.dataset.answered = '';
+    }, 1000);
+  }
+}
+
+// ── Quiz ───────────────────────────────────────
+function startQuiz() {
+  quizScore  = 0;
+  quizIndex  = 0;
+  quizAnswered = false;
+  document.getElementById('quiz-score').textContent = 0;
+  document.getElementById('quiz-total').textContent = 10;
+  document.getElementById('quiz-area').style.display = '';
+  document.getElementById('quiz-done').style.display = 'none';
+  nextQuizQuestion();
+}
+
+function nextQuizQuestion() {
+  if (quizIndex >= 10) { finishQuiz(); return; }
+  quizAnswered = false;
+
+  const correct = numbers[Math.floor(Math.random() * numbers.length)];
+  const mode = Math.random() < 0.5 ? 'korean-to-number' : 'number-to-korean';
+
+  if (mode === 'korean-to-number') {
+    document.getElementById('quiz-prompt').textContent = 'What number is this? 🤔';
+    document.getElementById('quiz-korean').textContent = correct.korean;
+    const opts = generateOptions(correct, 4);
+    renderQuizOptions(opts, (o) => o.n, correct.n, () => correct.n);
+  } else {
+    document.getElementById('quiz-prompt').textContent = 'How do you say ' + correct.n + ' in Korean?';
+    document.getElementById('quiz-korean').textContent = correct.n;
+    const opts = generateOptions(correct, 4);
+    renderQuizOptions(opts, (o) => o.korean, correct.korean, () => correct.korean);
+  }
+
+  AudioManager.speakKorean(correct.korean);
+}
+
+function renderQuizOptions(opts, labelFn, correctValue, correctFn) {
+  const container = document.getElementById('quiz-options');
+  container.innerHTML = '';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option';
+    btn.textContent = labelFn(o);
+    btn.onclick = () => checkQuizAnswer(btn, labelFn(o), correctValue, container);
+    container.appendChild(btn);
+  });
+}
+
+function checkQuizAnswer(btn, chosen, correct, container) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+
+  if (String(chosen) === String(correct)) {
+    btn.classList.add('correct');
+    showToast('Correct! 🎉 +10 pts', 'correct');
+    quizScore++;
+    document.getElementById('quiz-score').textContent = quizScore;
+    const result = ProgressManager.addPoints(10);
+    if (result.leveledUp) { launchConfetti(); showToast('Level Up! 🎉', 'star', 3000); }
+  } else {
+    btn.classList.add('wrong');
+    showToast('Not quite! 🙂', 'wrong');
+    // highlight correct
+    container.querySelectorAll('.quiz-option').forEach(b => {
+      if (String(b.textContent).trim() === String(correct)) b.classList.add('correct');
+    });
+  }
+  quizIndex++;
+  setTimeout(nextQuizQuestion, 1400);
+}
+
+function finishQuiz() {
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('quiz-done').style.display = '';
+  document.getElementById('quiz-final-score').textContent = quizScore;
+  const starsCount = Math.round((quizScore / 10) * 3);
+  document.getElementById('quiz-stars').textContent = '⭐'.repeat(starsCount);
+  if (quizScore >= 7) { launchConfetti(); }
+  if (starsCount > 0) ProgressManager.addStar();
+}
+
+// ── Helpers ────────────────────────────────────
+function generateOptions(correct, count) {
+  const opts = [correct];
+  while (opts.length < count) {
+    const rand = numbers[Math.floor(Math.random() * numbers.length)];
+    if (!opts.find(o => o.n === rand.n)) opts.push(rand);
+  }
+  return shuffle(opts);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderNumberGrid();
+  renderNumber();
+});
+</script>
+</body>
+</html>

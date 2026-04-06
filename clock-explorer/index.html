@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Clock Educator — a fun, child-friendly app to learn how to tell the time!">
+  <meta name="theme-color" content="#5f27cd">
+  <title>🕐 Clock Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- App is built dynamically by app.js -->
+  <noscript>
+    <div style="text-align:center;padding:40px;font-family:sans-serif;">
+      <h1>🕐 Clock Explorer</h1>
+      <p>Please enable JavaScript to use this app.</p>
+    </div>
+  </noscript>
+
+  <!-- Load scripts in dependency order: utils → clock → ad-config → ad-manager → app -->
+  <script src="js/utils.js"></script>
+  <script src="js/clock.js"></script>
+  <script src="js/ad-config.js"></script>
+  <script src="../shared/ad-manager.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
